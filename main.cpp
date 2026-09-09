@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 #include <istream>
 #include <string>
@@ -15,7 +16,18 @@ struct Task{
 std::vector<Task> tasks;
 bool listMode = false;
 
+void titleOutput(){
+    std::ifstream myfile;
+    myfile.open("title.txt");
+    std::string line;
+    while (getline(myfile, line))
+        std::cout<< line << "\n";
+    myfile.close();
+}
+
+
 void listOutput(){
+    titleOutput();
     std::cout << "--------------------------------------------------------------- \n";
     for (Task task : tasks){
         if (!task.state)
@@ -32,7 +44,7 @@ int runner(){
     std::cout << "c: create new Task \n";
     std::cout << "f: finish task \n";
     std::cout << "u: unfinish task \n";
-    std::cout << "leave blank to stop \n\n";
+    std::cout << "leave blank to stop \n----\n> ";
 
     std::string text;
     std::getline(std::cin, text);
@@ -47,7 +59,7 @@ int runner(){
     if (text == "c"){
         std::string newTaskname;
         listOutput();
-        std::cout << "\n";
+        std::cout << "\n󰄱 > ";
         std::getline(std::cin, newTaskname);
         if (newTaskname != "")
             tasks.push_back({newTaskname});
@@ -59,30 +71,32 @@ int runner(){
         std::string number;
         std::cout << "\033[2J\033[H";
         listOutput();
+        std::cout << "\n > ";
         std::getline(std::cin, number);
         int intNumber;
         if (number != ""){
             int intNumber = std::stoi(number);
             //tasks.erase(it);
             tasks[intNumber-1].state = true;
-            std::cout << "\033[2J\033[H";
             //std::cout << "Task " << number << " has been finished! \n";
         }
+        std::cout << "\033[2J\033[H";
     }
     // unfinish task
     if (text == "u"){
         std::string number;
         std::cout << "\033[2J\033[H";
         listOutput();
+        std::cout << "\n > ";
         std::getline(std::cin, number);
         int intNumber;
         if (number != ""){
             int intNumber = std::stoi(number);
             //tasks.erase(it);
             tasks[intNumber-1].state = false;
-            std::cout << "\033[2J\033[H";
             //std::cout << "Task " << number << " has been finished! \n";
         }
+        std::cout << "\033[2J\033[H";
     }
     return 0;
 }
@@ -117,10 +131,10 @@ void printBuh(){
 int main(){
     std::cout << "\033[2J\033[H";
     readFile();
-    //printBuh();
     int result = -1;
     while (result != 1)
        result = runner();
     writeFile();
+    listOutput();
     return 0;
 }
