@@ -4,6 +4,7 @@
 #include <list>
 #include <fstream>
 #include <iterator>
+#include <vector>
 
 
 struct Task{
@@ -11,63 +12,61 @@ struct Task{
     bool state = false;
 };
 
-std::list<Task> tasks;
+std::vector<Task> tasks;
 bool listMode = false;
 
 void listOutput(){
-    int i = 0;
+    std::cout << "--------------------------------------------------------------- \n";
     for (Task task : tasks){
-        std::cout << i << ": " << task.name << "\n";
+        if (!task.state)
+            std::cout << "󰄱 ";
+        else
+            std::cout << " ";
+        std::cout << task.name << "\n\n";
     }
-    std::cout << "\n\n";
+    std::cout << "---------------------------------------------------------------\n";
 }
 
 int runner(){
-    std::cout << "\n\n";
-    if (not listMode)
-        std::cout << "0: list Tasks (" << tasks.size() << ") \n";
-    std::cout << "1: create new Task \n";
-    std::cout << "2: finish task \n";
-    if (not listMode)
-        std::cout << "leave blank to stop \n";
-    if (listMode)
-        std::cout << "leave blank to go back \n";
+    listOutput();
+    std::cout << "c: create new Task \n";
+    std::cout << "f: finish task \n";
+    std::cout << "leave blank to stop \n\n";
+
     std::string text;
     std::getline(std::cin, text);
+    //clean cli
     std::cout << "\033[2J\033[H";
 
     // stop
     if (text == ""){
-        if (!listMode)
-            return 1;
-        listMode = false;
-        return 0;
-    }
-    // list all
-    if (text == "0"){
-        listOutput();
-        listMode = true;
+        return 1;
     }
     // new task
-    if (text == "1"){
-        listOutput();
+    if (text == "c"){
         std::string newTaskname;
+        listOutput();
         std::getline(std::cin, newTaskname);
         if (newTaskname != "")
             tasks.push_back({newTaskname});
         std::cout << "\033[2J\033[H";
-        std::cout << newTaskname << " has been created";
+        //std::cout << newTaskname << " has been created\n";
     }
     // finish task
-    if (text == "2"){
-        listOutput();
+    if (text == "f"){
         std::string number;
+        std::cout << "\033[2J\033[H";
+        listOutput();
         std::getline(std::cin, number);
+        int intNumber;
         if (number != ""){
             int intNumber = std::stoi(number);
-            auto it = std::next(tasks.begin(), intNumber);
-            tasks.erase(it);
+            //tasks.erase(it);
+            tasks[intNumber-1].state = true;
+            std::cout << "\033[2J\033[H";
+            //std::cout << "Task " << number << " has been finished! \n";
         }
+
     }
     return 0;
 }
@@ -84,8 +83,10 @@ void readFile(){
 void writeFile(){
     std::ofstream myfile;
     myfile.open("tasklist.txt");
-    for (Task task : tasks)
-        myfile << task.name << "\n";
+    for (Task task : tasks){
+        if (!task.state)
+            myfile << task.name << "\n";
+    }
     myfile.close();
 }
 void printBuh(){
@@ -98,8 +99,9 @@ void printBuh(){
 }
 
 int main(){
+    std::cout << "\033[2J\033[H";
     readFile();
-    printBuh();
+    //printBuh();
     int result = -1;
     while (result != 1)
        result = runner();
