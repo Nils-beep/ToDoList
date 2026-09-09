@@ -28,13 +28,18 @@ void titleOutput(){
 
 void listOutput(){
     titleOutput();
+    int taskNumber = 0;
     std::cout << "--------------------------------------------------------------- \n";
     for (Task task : tasks){
+        taskNumber++;
         if (!task.state)
             std::cout << "󰄱 ";
         else
             std::cout << " ";
-        std::cout << task.name << "\n";
+        std::cout << task.name;
+        for (int i=0; i<(60-task.name.length()); i++)
+            std::cout << " ";
+        std::cout << taskNumber <<"\n";
     }
     std::cout << "---------------------------------------------------------------\n";
 }
