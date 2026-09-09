@@ -22,7 +22,7 @@ void listOutput(){
             std::cout << "󰄱 ";
         else
             std::cout << " ";
-        std::cout << task.name << "\n\n";
+        std::cout << task.name << "\n";
     }
     std::cout << "---------------------------------------------------------------\n";
 }
@@ -46,6 +46,7 @@ int runner(){
     if (text == "c"){
         std::string newTaskname;
         listOutput();
+        std::cout << "\n";
         std::getline(std::cin, newTaskname);
         if (newTaskname != "")
             tasks.push_back({newTaskname});
