@@ -31,6 +31,7 @@ int runner(){
     listOutput();
     std::cout << "c: create new Task \n";
     std::cout << "f: finish task \n";
+    std::cout << "u: unfinish task \n";
     std::cout << "leave blank to stop \n\n";
 
     std::string text;
@@ -67,7 +68,21 @@ int runner(){
             std::cout << "\033[2J\033[H";
             //std::cout << "Task " << number << " has been finished! \n";
         }
-
+    }
+    // unfinish task
+    if (text == "u"){
+        std::string number;
+        std::cout << "\033[2J\033[H";
+        listOutput();
+        std::getline(std::cin, number);
+        int intNumber;
+        if (number != ""){
+            int intNumber = std::stoi(number);
+            //tasks.erase(it);
+            tasks[intNumber-1].state = false;
+            std::cout << "\033[2J\033[H";
+            //std::cout << "Task " << number << " has been finished! \n";
+        }
     }
     return 0;
 }
