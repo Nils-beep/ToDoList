@@ -1,10 +1,7 @@
-#include <cstdio>
 #include <iostream>
 #include <istream>
 #include <string>
-#include <list>
 #include <fstream>
-#include <iterator>
 #include <vector>
 
 enum Priority{
@@ -21,6 +18,21 @@ struct Task{
 
 std::vector<Task> tasks;
 bool listMode = false;
+
+Priority findPrio(std::string* line){
+    Priority prio = LOW;
+    int pos = line->find("!");
+    if (pos != -1){
+        prio = MEDIUM;
+        line->erase(pos, 1);
+        pos = line->find("!");
+        if (pos != -1){
+            prio = HIGH;
+            line->erase(pos, 1);
+        }
+    }
+    return prio;
+}
 
 void titleOutput(){
     std::ifstream myfile;
@@ -60,15 +72,6 @@ void choiceOutput(){
     std::cout << "leave blank to stop \n----\n> ";
 }
 
-void createTask(){
-    std::string newTaskname;
-    listOutput();
-    std::cout << "\n󰄱 > ";
-    std::getline(std::cin, newTaskname);
-    if (newTaskname != "")
-        tasks.push_back({newTaskname});
-    std::cout << "\033[2J\033[H";
-} //todo task prio on create
 void finishTask(){
     std::string number;
     std::cout << "\033[2J\033[H";
@@ -117,6 +120,20 @@ void sortByPriority(){
     tasks = sortedList;
 }
 
+void createTask(){
+    std::string newTaskname;
+    listOutput();
+    std::cout << "\n󰄱 > ";
+    std::getline(std::cin, newTaskname);
+    Priority prio = findPrio(&newTaskname);
+    if (newTaskname != "")
+        tasks.push_back({newTaskname});
+    std::cout << "\033[2J\033[H";
+    tasks.back().prio = prio;
+    sortByPriority();
+
+} //todo task prio on create
+
 int handleInput(){
     std::string text;
     std::getline(std::cin, text);
@@ -145,17 +162,7 @@ void readFile(){
     myfile.open("tasklist.txt");
     std::string line;
     while (getline(myfile, line)){
-        Priority prio = LOW;
-        int pos = line.find("!");
-        if (pos != -1){
-            prio = MEDIUM;
-            line.erase(pos, 1);
-            pos = line.find("!");
-            if (pos != -1){
-                prio = HIGH;
-                line.erase(pos, 1);
-            }
-        }
+        Priority prio = findPrio(&line);
         tasks.push_back({line});
         tasks.back().prio = prio;
     }
