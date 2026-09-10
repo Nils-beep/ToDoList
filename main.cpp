@@ -36,15 +36,16 @@ void listOutput(){
     std::cout << "--------------------------------------------------------------- \n";
     for (Task task : tasks){
         taskNumber++;
-        if (!task.state)
-            std::cout << "󰄱 ";
-        else
-            std::cout << " ";
         if (task.prio == LOW)
             std::cout << "🟩 ";
             else if (task.prio == MEDIUM)
                 std::cout << "🟨 ";
             else std::cout << "🟥 ";
+        if (!task.state)
+            std::cout << "󰄱 ";
+        else
+            std::cout << " ";
+
         std::cout << task.name;
         for (int i=0; i<(60-task.name.length()); i++)
             std::cout << " ";
@@ -100,14 +101,20 @@ void changePriority(){
 
 }
 void sortByPriority(){
-    for (int i=0; i<tasks.size(); i++){
-        for (int j=1; j<tasks.size(); j++)
-            if (tasks[i].prio < tasks[j].prio){
-                Task taskHelper = tasks[i];
-                tasks[i] = tasks[j];
-                tasks[j] = taskHelper;
-            }
+    std::vector<Task>sortedList;
+    for (Task task : tasks){
+        if (task.prio == HIGH)
+            sortedList.push_back(task);
     }
+    for (Task task : tasks){
+        if (task.prio == MEDIUM)
+            sortedList.push_back(task);
+    }
+    for (Task task : tasks){
+        if (task.prio == LOW)
+            sortedList.push_back(task);
+    }
+    tasks = sortedList;
 }
 
 int handleInput(){
