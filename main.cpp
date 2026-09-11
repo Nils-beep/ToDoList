@@ -69,6 +69,7 @@ void choiceOutput(){
     std::cout << "c: create new Task \n";
     std::cout << "f: finish task \n";
     std::cout << "u: unfinish task \n";
+    std::cout << "p: change priority \n";
     std::cout << "leave blank to stop \n----\n> ";
 }
 
@@ -101,7 +102,11 @@ void unfinishTask(){
     std::cout << "\033[2J\033[H";
 }
 void changePriority(){
-
+    std::string line;
+    std::cout << "\033[2J\033[H";
+    listOutput();
+    std::cout << "\n > ";
+    std::getline(std::cin, line);
 }
 void sortByPriority(){
     std::vector<Task>sortedList;
@@ -148,6 +153,8 @@ int handleInput(){
         finishTask();
     if (text == "u")
         unfinishTask();
+    if (text == "p")
+        changePriority();
     return 0;
 }
 int runner(){
@@ -189,7 +196,7 @@ void writeFile(){
 int main(){
     std::cout << "\033[2J\033[H";
     readFile();
-    sortByPriority();
+    //sortByPriority();
     int result = -1;
     while (result != 1)
        result = runner();
