@@ -1,8 +1,13 @@
+#include <cctype>
 #include <iostream>
 #include <istream>
+#include <sstream>
 #include <string>
 #include <fstream>
+#include <variant>
 #include <vector>
+#include <bits/stdc++.h>
+#include <algorithm>
 
 enum Priority{
     LOW,
@@ -83,84 +88,45 @@ void listOutput(){
     std::cout << "---------------------------------------------------------------\n";
 }
 void choiceOutput(){
-    std::cout << "c: create new Task \n";
-    std::cout << "f: finish task \n";
-    std::cout << "u: unfinish task \n";
-    std::cout << "p: change priority \n";
-    std::cout << "leave blank to stop \n----\n> ";
+    std::cout <<"\n > ";
 }
 
-void finishTask(){
-    std::string number;
-    std::cout << "\033[2J\033[H";
-    listOutput();
-    std::cout << "\n > ";
-    std::getline(std::cin, number);
-    int intNumber;
-    if (number != ""){
-        int intNumber = std::stoi(number);
-        tasks[intNumber-1].state = true;
-    }
-    std::cout << "\033[2J\033[H";
-}
-void unfinishTask(){
-    std::string number;
-    std::cout << "\033[2J\033[H";
-    listOutput();
-    std::cout << "\n > ";
-    std::getline(std::cin, number);
-    int intNumber;
-    if (number != ""){
-        int intNumber = std::stoi(number);
-        //tasks.erase(it);
-        tasks[intNumber-1].state = false;
-        //std::cout << "Task " << number << " has been finished! \n";
-    }
-    std::cout << "\033[2J\033[H";
-}
-void changePriority(){
-    std::string line;
-    std::cout << "\033[2J\033[H";
-    listOutput();
-    std::cout << "\n > ";
-    std::getline(std::cin, line);
-    Priority prio = findPrio(&line);
-    tasks[std::stoi(line)-1].prio = prio;
+void changePriority(int index, Priority prio){
+    tasks[index-1].prio = prio;
     sortByPriority();
-    std::cout << "\033[2J\033[H";   
 }
 
 
-void createTask(){
-    std::string newTaskname;
-    listOutput();
-    std::cout << "\n󰄱 > ";
-    std::getline(std::cin, newTaskname);
-    Priority prio = findPrio(&newTaskname);
-    if (newTaskname != "")
-        tasks.push_back({newTaskname});
-    std::cout << "\033[2J\033[H";
-    tasks.back().prio = prio;
+void createTask(std::string name){
+    Priority prio = findPrio(&name);
+    tasks.push_back({name, false, prio});
     sortByPriority();
-
-} //todo task prio on create
+}
 
 int handleInput(){
     std::string text;
     std::getline(std::cin, text);
+    //text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
+
     //clean cli
     std::cout << "\033[2J\033[H";
-
     if (text == "")
         return 1;
-    if (text == "c")
-        createTask();
-    if (text == "f")
-        finishTask();
-    if (text == "u")
-        unfinishTask();
-    if (text == "p")
-        changePriority();
+    int commaPos = text.find(",");
+    if (!(commaPos == std::variant_npos)){
+        std::string first = text.substr(0,commaPos);
+        std::string second = text.substr(commaPos+1);
+        Priority prio = findPrio(&second);
+        changePriority(std::stoi(first), prio);
+    }
+    else{
+        if (!std::isdigit(text[0]))
+            createTask(text);
+        else{
+            int index = std::stoi(text);
+            tasks[index-1].state = !tasks[index-1].state;
+        }
+    }
     return 0;
 }
 int runner(){
