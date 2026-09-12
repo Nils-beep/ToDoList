@@ -21,7 +21,7 @@ struct Task{
     Priority prio = LOW;
 };
 
-std::vector<Task> tasks;
+std::vector<std::vector<Task>>tasks;
 bool listMode = false;
 
 Priority findPrio(std::string* line){
@@ -167,7 +167,6 @@ void writeFile(){
 int main(){
     std::cout << "\033[2J\033[H";
     readFile();
-    //sortByPriority();
     int result = -1;
     while (result != 1)
        result = runner();
