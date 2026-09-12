@@ -33,6 +33,23 @@ Priority findPrio(std::string* line){
     }
     return prio;
 }
+void sortByPriority(){
+    std::vector<Task>sortedList;
+    for (Task task : tasks){
+        if (task.prio == HIGH)
+            sortedList.push_back(task);
+    }
+    for (Task task : tasks){
+        if (task.prio == MEDIUM)
+            sortedList.push_back(task);
+    }
+    for (Task task : tasks){
+        if (task.prio == LOW)
+            sortedList.push_back(task);
+    }
+    tasks = sortedList;
+    sortedList.clear();
+}
 
 void titleOutput(){
     std::ifstream myfile;
@@ -108,25 +125,11 @@ void changePriority(){
     std::cout << "\n > ";
     std::getline(std::cin, line);
     Priority prio = findPrio(&line);
-    std::cout << line;
     tasks[std::stoi(line)-1].prio = prio;
+    sortByPriority();
+    std::cout << "\033[2J\033[H";   
 }
-void sortByPriority(){
-    std::vector<Task>sortedList;
-    for (Task task : tasks){
-        if (task.prio == HIGH)
-            sortedList.push_back(task);
-    }
-    for (Task task : tasks){
-        if (task.prio == MEDIUM)
-            sortedList.push_back(task);
-    }
-    for (Task task : tasks){
-        if (task.prio == LOW)
-            sortedList.push_back(task);
-    }
-    tasks = sortedList;
-}
+
 
 void createTask(){
     std::string newTaskname;
@@ -178,7 +181,6 @@ void readFile(){
     }
     myfile.close();
 }
-
 void writeFile(){
     std::ofstream myfile;
     myfile.open("tasklist.txt");
