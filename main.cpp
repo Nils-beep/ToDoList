@@ -107,6 +107,9 @@ void changePriority(){
     listOutput();
     std::cout << "\n > ";
     std::getline(std::cin, line);
+    Priority prio = findPrio(&line);
+    std::cout << line;
+    tasks[std::stoi(line)-1].prio = prio;
 }
 void sortByPriority(){
     std::vector<Task>sortedList;
