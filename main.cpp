@@ -88,11 +88,7 @@ void listOutput(){
     std::cout << "---------------------------------------------------------------\n";
 }
 void choiceOutput(){
-    std::cout << "c: create new Task \n";
-    std::cout << "f: finish task \n";
-    std::cout << "u: unfinish task \n";
-    std::cout << "p: change priority \n";
-    std::cout << "leave blank to stop \n----\n> ";
+    std::cout <<"\n > ";
 }
 
 void changePriority(int index, Priority prio){
@@ -101,7 +97,8 @@ void changePriority(int index, Priority prio){
 }
 
 
-void createTask(std::string name, Priority prio){
+void createTask(std::string name){
+    Priority prio = findPrio(&name);
     tasks.push_back({name, false, prio});
     sortByPriority();
 }
@@ -109,7 +106,7 @@ void createTask(std::string name, Priority prio){
 int handleInput(){
     std::string text;
     std::getline(std::cin, text);
-    text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
+    //text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
 
     //clean cli
     std::cout << "\033[2J\033[H";
@@ -120,13 +117,15 @@ int handleInput(){
         std::string first = text.substr(0,commaPos);
         std::string second = text.substr(commaPos+1);
         Priority prio = findPrio(&second);
-        if (!std::isdigit(text[commaPos-1]))
-             createTask(first, prio);
-        else changePriority(std::stoi(first), prio);
+        changePriority(std::stoi(first), prio);
     }
     else{
-        int index = std::stoi(text);
-        tasks[index-1].state = !tasks[index-1].state;
+        if (!std::isdigit(text[0]))
+            createTask(text);
+        else{
+            int index = std::stoi(text);
+            tasks[index-1].state = !tasks[index-1].state;
+        }
     }
     return 0;
 }
