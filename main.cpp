@@ -127,7 +127,7 @@ void changePriority(){
     Priority prio = findPrio(&line);
     tasks[std::stoi(line)-1].prio = prio;
     sortByPriority();
-    std::cout << "\033[2J\033[H";   
+    std::cout << "\033[2J\033[H";
 }
 
 
@@ -142,8 +142,7 @@ void createTask(){
     std::cout << "\033[2J\033[H";
     tasks.back().prio = prio;
     sortByPriority();
-
-} //todo task prio on create
+}
 
 int handleInput(){
     std::string text;
