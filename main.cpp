@@ -8,6 +8,9 @@
 #include <vector>
 #include <bits/stdc++.h>
 #include <filesystem>
+#include <cassert>
+#include <ranges>
+#include <vector>
 
 #define  clearScreen std::cout << "\033[2J\033[H";
 
@@ -21,14 +24,19 @@ enum Priority{
 };
 
 struct Task{
-    std::string name;
+    std::string name = "";
     bool state = false;
     Priority prio = LOW;
 };
 
-std::vector<std::vector<Task>>tasklist;
-std::vector<Task> selectedTasks;
-bool listChosen = false;
+struct TaskList{
+    std::string name;
+    std::vector<Task> tasks;
+};
+
+std::vector<TaskList> tasklists;
+TaskList selectedTasks;
+int listChosen = -1;
 
 
 Priority findPrio(std::string* line){
@@ -45,21 +53,21 @@ Priority findPrio(std::string* line){
     }
     return prio;
 }
-void sortByPriority(std::vector<Task>* tasks){
+void sortByPriority(TaskList* tasklist){
     std::vector<Task>sortedList;
-    for (Task task : *tasks){
+    for (Task task : tasklist->tasks){
         if (task.prio == HIGH)
             sortedList.push_back(task);
     }
-    for (Task task : *tasks){
+    for (Task task : tasklist->tasks){
         if (task.prio == MEDIUM)
             sortedList.push_back(task);
     }
-    for (Task task : *tasks){
+    for (Task task : tasklist->tasks){
         if (task.prio == LOW)
             sortedList.push_back(task);
     }
-    *tasks = sortedList;
+    tasklist->tasks = sortedList;
     sortedList.clear();
 }
 
@@ -71,10 +79,10 @@ void titleOutput(){
         std::cout<< line << "\n";
     myfile.close();
 }
-void listOutput(std::vector<Task>* tasks){
+void listOutput(TaskList* tasklist){
     int taskNumber = 0;
     std::cout << "--------------------------------------------------------------- \n";
-    for (Task task : *tasks){
+    for (Task task : tasklist->tasks){
         taskNumber++;
         if (task.prio == LOW)
             std::cout << "🟩 ";
@@ -99,13 +107,13 @@ void inputLine(){
 }
 
 void changePriority(int index, Priority prio){
-    selectedTasks[index-1].prio = prio;
+    selectedTasks.tasks[index-1].prio = prio; //was .name before
     sortByPriority(&selectedTasks);
 }
 
 void createTask(std::string name){
     Priority prio = findPrio(&name);
-    selectedTasks.push_back({name, false, prio});
+    selectedTasks.tasks.push_back({name, false, prio});
     sortByPriority(&selectedTasks);
 }
 
@@ -114,18 +122,19 @@ int chooseList(){
     titleOutput();
     int listIndex;
     std::string string;
-    for (std::vector<Task> list : tasklist)
+
+    for (TaskList list : tasklists)
         listOutput(&list);
     inputLine();
     std::getline(std::cin, string);
     if (string == "")
-        return -1;
+        return 1;
     listIndex = std::stoi(string);
-    if ((listIndex > tasklist.size()) || (listIndex <= 0))
-        return 0;
-    selectedTasks = tasklist[listIndex-1];
+    if ((listIndex > tasklists.size()) || (listIndex <= 0))
+        return -1;
+    selectedTasks = tasklists[listIndex-1];
     clearScreen
-    return 1;
+    return 0;
 }
 
 int handleInput(){
@@ -134,8 +143,9 @@ int handleInput(){
     //text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
     //clean cli
     clearScreen;
-    while (text == ""){
-        listChosen = false;
+    listOutput(&selectedTasks);
+    if (text == ""){
+        listChosen = -1;
         return 0;
     }
     int commaPos = text.find(",");
@@ -150,17 +160,19 @@ int handleInput(){
             createTask(text);
         else{
             int index = std::stoi(text);
-            selectedTasks[index-1].state = !selectedTasks[index-1].state;
+            selectedTasks.tasks[index-1].state = !selectedTasks.tasks[index-1].state;
         }
     }
     return 0;
 }
 int runner(){
     titleOutput();
-    if (listChosen==0){
+    if (listChosen==-1){
         listChosen = chooseList();
         return listChosen;
     }
+    clearScreen;
+    titleOutput();
     listOutput(&selectedTasks);
     inputLine();
 
@@ -171,12 +183,12 @@ void readFile(){
     for (const auto& dirEntry : recursive_directory_iterator("tasklists")){
         std::ifstream myfile;
         myfile.open(dirEntry.path());
-        tasklist.push_back({});
+        tasklists.push_back({});
         std::string line;
         while (getline(myfile, line)){
             Priority prio = findPrio(&line);
-            tasklist[tasklist.size()-1].push_back({line});
-            tasklist[tasklist.size()-1].back().prio = prio;
+            tasklists[tasklists.size()-1].tasks.push_back({line, false, prio});
+            std::cout << tasklists[tasklists.size()-1].tasks.back().name <<" " << tasklists[tasklists.size()-1].tasks.back().prio << "\n";
         }
     myfile.close();
     }
