@@ -1,6 +1,7 @@
 #include <cctype>
 #include <iostream>
 #include <istream>
+#include <list>
 #include <sstream>
 #include <string>
 #include <fstream>
@@ -12,10 +13,9 @@
 #include <ranges>
 #include <vector>
 
-#define  clearScreen std::cout << "\033[2J\033[H";
+#define clearScreen std::cout << "\033[2J\033[H";
 
-using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
-
+const std::string listFolder = "tasklists";
 
 enum Priority{
     LOW,
@@ -35,9 +35,9 @@ struct TaskList{
 };
 
 std::vector<TaskList> tasklists;
+std::vector<std::string> filesToDelete;
 int selectedTasklist;
 int listChosen = -1;
-
 
 Priority findPrio(std::string* line){
     Priority prio = LOW;
@@ -139,7 +139,20 @@ void createList(std::string name){
     name.erase(0,1);
     std::cout << "works";
     tasklists.push_back({name});
+}
 
+void deleteList(){
+    std::string filePath = listFolder + "/" + tasklists[selectedTasklist].name + ".txt";
+    std::remove((filePath.c_str()));
+    tasklists.erase(tasklists.begin()+selectedTasklist);
+    listChosen = -1;
+    selectedTasklist = 0; //so we dont get an invalid value
+}
+
+void handleEmptyList(){
+    for (Task task : tasklists[selectedTasklist].tasks)
+        if (task.state == false) return;
+    deleteList();
 }
 
 int chooseList(){
@@ -172,8 +185,6 @@ int chooseList(){
 int handleInput(){
     std::string text;
     std::getline(std::cin, text);
-    //text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
-    //clean cli
     clearScreen;
     listOutput();
     if (text == ""){
@@ -193,6 +204,7 @@ int handleInput(){
         else{
             int index = std::stoi(text);
             tasklists[selectedTasklist].tasks[index-1].state = !tasklists[selectedTasklist].tasks[index-1].state;
+            //handleEmptyList();
         }
     }
     return 0;
@@ -212,7 +224,7 @@ int runner(){
 }
 
 void readFile(){
-    for (const auto& dirEntry : recursive_directory_iterator("tasklists")){
+    for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(listFolder)){
         std::ifstream myfile;
         myfile.open(dirEntry.path());
         tasklists.push_back({});
@@ -230,7 +242,7 @@ void writeFile(){
     int index = 0;
     for (TaskList list : tasklists){
         std::ofstream myfile;
-        std::string path = "tasklists/" + list.name + ".txt";
+        std::string path = listFolder + "/" + list.name + ".txt";
         myfile.open(path);
         for (Task task : tasklists[index].tasks){
             if (!task.state){
@@ -249,6 +261,8 @@ void writeFile(){
 }
 
 int main(){
+    if (!std::filesystem::exists(listFolder))
+        std::filesystem::create_directory(listFolder);
     clearScreen;
     readFile();
     while (runner() != 1);
