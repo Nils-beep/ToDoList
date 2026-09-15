@@ -35,7 +35,7 @@ struct TaskList{
 };
 
 std::vector<TaskList> tasklists;
-TaskList selectedTasks;
+int selectedTasklist;
 int listChosen = -1;
 
 
@@ -53,21 +53,21 @@ Priority findPrio(std::string* line){
     }
     return prio;
 }
-void sortByPriority(TaskList* tasklist){
+void sortByPriority(){
     std::vector<Task>sortedList;
-    for (Task task : tasklist->tasks){
+    for (Task task : tasklists[selectedTasklist].tasks){
         if (task.prio == HIGH)
             sortedList.push_back(task);
     }
-    for (Task task : tasklist->tasks){
+    for (Task task : tasklists[selectedTasklist].tasks){
         if (task.prio == MEDIUM)
             sortedList.push_back(task);
     }
-    for (Task task : tasklist->tasks){
+    for (Task task : tasklists[selectedTasklist].tasks){
         if (task.prio == LOW)
             sortedList.push_back(task);
     }
-    tasklist->tasks = sortedList;
+    tasklists[selectedTasklist].tasks = sortedList;
     sortedList.clear();
 }
 
@@ -79,10 +79,11 @@ void titleOutput(){
         std::cout<< line << "\n";
     myfile.close();
 }
-void listOutput(TaskList* tasklist){
+void listOutput(){
     int taskNumber = 0;
-    std::cout << "--------------------------------------------------------------- \n";
-    for (Task task : tasklist->tasks){
+    std::cout << "\n";
+    std::cout << "-------------------------------- " << tasklists[selectedTasklist].name<<" --------------------------------\n";
+    for (Task task : tasklists[selectedTasklist].tasks){
         taskNumber++;
         if (task.prio == LOW)
             std::cout << "🟩 ";
@@ -96,25 +97,49 @@ void listOutput(TaskList* tasklist){
             std::cout << " ";
 
         std::cout << task.name;
-        for (int i=0; i<(60-task.name.length()); i++)
+        for (int i=0; i<(60-task.name.length()+tasklists[selectedTasklist].name.length()+1 -1); i++)
             std::cout << " ";
         std::cout << taskNumber <<"\n";
     }
-    std::cout << "---------------------------------------------------------------\n";
+    std::cout << std::string(tasklists[selectedTasklist].name.length()+1,'-')<< "-----------------------------------------------------------------\n";
 }
 void inputLine(){
     std::cout <<"\n > ";
 }
 
+void fullListOutput(){
+    clearScreen;
+    titleOutput();
+    selectedTasklist = 0;
+    for (TaskList list : tasklists){
+        listOutput();
+        selectedTasklist++;
+    }
+}
+void fullListSort(){
+    selectedTasklist = 0;
+    for (TaskList list : tasklists){
+        sortByPriority();
+        selectedTasklist++;
+    }
+}
+
 void changePriority(int index, Priority prio){
-    selectedTasks.tasks[index-1].prio = prio; //was .name before
-    sortByPriority(&selectedTasks);
+    tasklists[selectedTasklist].tasks[index-1].prio = prio; //was .name before
+    sortByPriority();
 }
 
 void createTask(std::string name){
     Priority prio = findPrio(&name);
-    selectedTasks.tasks.push_back({name, false, prio});
-    sortByPriority(&selectedTasks);
+    tasklists[selectedTasklist].tasks.push_back({name, false, prio});
+    sortByPriority();
+}
+
+void createList(std::string name){
+    name.erase(0,1);
+    std::cout << "works";
+    tasklists.push_back({name});
+
 }
 
 int chooseList(){
@@ -122,17 +147,24 @@ int chooseList(){
     titleOutput();
     int listIndex;
     std::string string;
-
-    for (TaskList list : tasklists)
-        listOutput(&list);
+    selectedTasklist = 0;
+    for (TaskList list : tasklists){
+        listOutput();
+        selectedTasklist++;
+    }
     inputLine();
     std::getline(std::cin, string);
     if (string == "")
         return 1;
+
+    if (string[0] == '/'){
+        createList(string);
+        return 0;
+    }
     listIndex = std::stoi(string);
     if ((listIndex > tasklists.size()) || (listIndex <= 0))
         return -1;
-    selectedTasks = tasklists[listIndex-1];
+    selectedTasklist = listIndex-1;
     clearScreen
     return 0;
 }
@@ -143,7 +175,7 @@ int handleInput(){
     //text.erase(std::remove (text.begin(), text.end(), ' '), text.end());
     //clean cli
     clearScreen;
-    listOutput(&selectedTasks);
+    listOutput();
     if (text == ""){
         listChosen = -1;
         return 0;
@@ -160,7 +192,7 @@ int handleInput(){
             createTask(text);
         else{
             int index = std::stoi(text);
-            selectedTasks.tasks[index-1].state = !selectedTasks.tasks[index-1].state;
+            tasklists[selectedTasklist].tasks[index-1].state = !tasklists[selectedTasklist].tasks[index-1].state;
         }
     }
     return 0;
@@ -173,7 +205,7 @@ int runner(){
     }
     clearScreen;
     titleOutput();
-    listOutput(&selectedTasks);
+    listOutput();
     inputLine();
 
     return handleInput();
@@ -185,36 +217,42 @@ void readFile(){
         myfile.open(dirEntry.path());
         tasklists.push_back({});
         std::string line;
+        tasklists.back().name = dirEntry.path().stem();
         while (getline(myfile, line)){
             Priority prio = findPrio(&line);
             tasklists[tasklists.size()-1].tasks.push_back({line, false, prio});
-            std::cout << tasklists[tasklists.size()-1].tasks.back().name <<" " << tasklists[tasklists.size()-1].tasks.back().prio << "\n";
+            //std::cout << tasklists[tasklists.size()-1].tasks.back().name <<" " << tasklists[tasklists.size()-1].tasks.back().prio << "\n";
         }
-    myfile.close();
+        myfile.close();
     }
 }
-/*void writeFile(){
-    std::ofstream myfile;
-    myfile.open("tasklist.txt");
-    for (Task task : tasks){
-        if (!task.state){
-            myfile << task.name;
-            if (task.prio == HIGH)
+void writeFile(){
+    int index = 0;
+    for (TaskList list : tasklists){
+        std::ofstream myfile;
+        std::string path = "tasklists/" + list.name + ".txt";
+        myfile.open(path);
+        for (Task task : tasklists[index].tasks){
+            if (!task.state){
+                myfile << task.name;
+                if (task.prio == HIGH)
                 myfile << "!!";
-            else
-                if (task.prio == MEDIUM)
-                    myfile << "!";
-        myfile << "\n";
+                else
+                    if (task.prio == MEDIUM)
+                        myfile << "!";
+                myfile << "\n";
+            }
         }
+        myfile.close();
+        index++;
     }
-    myfile.close();
-    }*/
+}
 
 int main(){
     clearScreen;
     readFile();
     while (runner() != 1);
-    //writeFile();
-    //listOutput();
+    writeFile();
+    fullListOutput();
     return 0;
 }
