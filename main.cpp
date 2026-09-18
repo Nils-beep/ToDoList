@@ -146,7 +146,7 @@ void deleteList(){
     std::remove((filePath.c_str()));
     tasklists.erase(tasklists.begin()+selectedTasklist);
     listChosen = -1;
-    selectedTasklist = 0; //so we dont get an invalid value
+    selectedTasklist = 0; //so we don't get an invalid value
 }
 
 void handleEmptyList(){
