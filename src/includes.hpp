@@ -12,3 +12,16 @@
 #include <cassert>
 #include <ranges>
 #include <vector>
+
+enum Window{
+    MAINWINDOW,
+    TASKWINDOW,
+    TIMERWINDOW,
+};
+
+
+enum Priority{
+    LOW,
+    MEDIUM,
+    HIGH,
+};
