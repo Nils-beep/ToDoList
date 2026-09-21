@@ -33,6 +33,7 @@ class Tasklist{
             sortByPriority();
         }
         void display();
+        void findPriority(std::string* line);
 };
 
 inline void Task::findPriority(std::string* line){
@@ -48,6 +49,20 @@ inline void Task::findPriority(std::string* line){
         }
     }
     this->prio = p;
+}
+inline void Tasklist::findPriority(std::string* line){
+    Priority p = LOW;
+    std::string::size_type pos = line->find("!");
+    if (pos != std::string::npos){
+        p = MEDIUM;
+        line->erase(pos, 1);
+        pos = line->find("!");
+        if (pos != std::string::npos){
+            p = HIGH;
+            line->erase(pos, 1);
+        }
+    }
+    this->tasks[stoi(*line)-1].changePrio(p);
 }
 
 inline void Tasklist::sortByPriority(){
@@ -67,7 +82,6 @@ inline void Tasklist::sortByPriority(){
     tasks = sortedList;
     sortedList.clear();
 }
-
 inline void Tasklist::display(){
     int taskNumber = 0;
     std::cout << "\n";

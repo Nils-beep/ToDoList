@@ -1,6 +1,8 @@
 #include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
+#include <string>
+#include <variant>
 
 
 
@@ -79,9 +81,9 @@ int TaskWindow::handleInput(){
             selectedTasklist = -1;
             return 0;
         }
-        if (text.substr(0,3) == "new"){
+        if (text.substr(0, 4) == "prio"){
             text = text.substr(4, text.length());
-            tasklists[selectedTasklist].addTask(&text);
+            tasklists[selectedTasklist].findPriority(&text);
         }
 
     }
