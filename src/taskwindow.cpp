@@ -28,19 +28,19 @@ void TaskWindow::readFile(){
         myfile.close();
     }
 }
-/*void TaskWindow::writeFile(){
+void TaskWindow::writeFile(){
     int index = 0;
     for (Tasklist list : tasklists){
         std::ofstream myfile;
-        std::string path = listFolder + "/" + list.name + ".txt";
+        std::string path = listFolder + "/" + list.getName() + ".txt";
         myfile.open(path);
-        for (Task task : tasklists[index].tasks){
-            if (!task.state){
-                myfile << task.name;
-                if (task.prio == HIGH)
+        for (Task task : *tasklists[index].getTasks()){
+            if (!task.getState()){
+                myfile << task.getName();
+                if (task.getPrio() == HIGH)
                 myfile << "!!";
                 else
-                    if (task.prio == MEDIUM)
+                    if (task.getPrio() == MEDIUM)
                         myfile << "!";
                 myfile << "\n";
             }
@@ -49,10 +49,9 @@ void TaskWindow::readFile(){
         index++;
     }
 }
-*/
 
 int TaskWindow::handleInput(){
-    std::cout<<"\n" << "👂️>";
+    std::cout<<"\n" << "👂️> ";
     std::string text;
     std::getline(std::cin, text);
     if (selectedTasklist == -1){
@@ -60,13 +59,8 @@ int TaskWindow::handleInput(){
             std::cout << "got here\n";
             return -1;
         }
-        text.erase(remove_if(text.begin(), text.end(), isspace));
-        if (text.substr(0, 4) == "open"){
-            text = text.substr(4, text.length());
-            if ((text != "") && isInteger(text)){
-                if (stoi(text) <= (tasklists.size()))
-                    selectedTasklist = stoi(text) - 1;
-            }
+        if (isInteger(text)){
+            selectedTasklist = stoi(text)-1;
             return 0;
         }
         if (text.substr(0,3) == "new"){
@@ -84,8 +78,13 @@ int TaskWindow::handleInput(){
         if (text.substr(0, 4) == "prio"){
             text = text.substr(4, text.length());
             tasklists[selectedTasklist].findPriority(&text);
+            return 0;
         }
-
+        if (isInteger(text)){
+            tasklists[selectedTasklist].toggleTask(stoi(text)-1);
+            return 0;
+        }
+        tasklists[selectedTasklist].addTask(&text);
     }
     return 0;
 }
@@ -101,6 +100,7 @@ void TaskWindow::run(Terminal* terminal){
     int next = handleInput();
     if (next == -1){
         terminal->changeWindow(MAINWINDOW);
+        writeFile();
         CLEARSCREEN;
         return;
     }

@@ -61,6 +61,7 @@ class Terminal {
 void inline MainWindow::run(){
     std::string text;
     std::getline(std::cin, text);
-    if (text == "")
+    if (text == ""){
         closeTerminal = true;
+    }
 }

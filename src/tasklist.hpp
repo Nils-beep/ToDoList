@@ -1,6 +1,7 @@
 #pragma once
 #include "includes.hpp"
 #include <string>
+#include <vector>
 
 class Task{
     private:
@@ -32,8 +33,11 @@ class Tasklist{
             tasks.push_back(line);
             sortByPriority();
         }
+        void toggleTask(int index){tasks[index].toggleTask();}
         void display();
         void findPriority(std::string* line);
+        std::vector<Task>* getTasks(){return &tasks;};
+        std::string getName(){return name;}
 };
 
 inline void Task::findPriority(std::string* line){
