@@ -13,6 +13,10 @@
 #include <ranges>
 #include <vector>
 
+#define CLEARSCREEN std::cout << "\033[2J\033[H";
+
+const std::string listFolder = "tasklists";
+
 enum Window{
     MAINWINDOW,
     TASKWINDOW,

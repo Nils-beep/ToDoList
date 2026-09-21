@@ -1,29 +1,94 @@
+#pragma once
 #include "includes.hpp"
-#include <vector>
+#include <string>
 
 class Task{
-    Task(std::string n, bool s, Priority p){
-        name = n; state = s; prio = p;
-    }
     private:
         std::string name;
-        bool state;
+        bool state = false;
         Priority prio;
+        void findPriority(std::string* line);
     public:
+        Task(std::string* line){
+            findPriority(line);
+            name = *line;
+        }
         void changePrio(Priority p){prio = p;}
         void toggleTask(){state = !state;}
-
         Priority getPrio(){return prio;}
-
+        bool getState(){return state;}
+        std::string getName(){return name;}
 };
 
 class Tasklist{
-    Tasklist(std::string n, Priority p){name = n; prio = p;}
     private:
         std::string name;
         Priority prio;
         std::vector<Task> tasks;
+        void sortByPriority();
     public:
-        void addTask(std::string n, Priority p){tasks.push_back();}
+        Tasklist(std::string n, Priority p){name = n; prio = p;}
+        void addTask(std::string* line){
+            tasks.push_back(line);
+            sortByPriority();
+        }
+        void display();
+};
 
+inline void Task::findPriority(std::string* line){
+    Priority p = LOW;
+    std::string::size_type pos = line->find("!");
+    if (pos != std::string::npos){
+        p = MEDIUM;
+        line->erase(pos, 1);
+        pos = line->find("!");
+        if (pos != std::string::npos){
+            p = HIGH;
+            line->erase(pos, 1);
+        }
+    }
+    this->prio = p;
+}
+
+inline void Tasklist::sortByPriority(){
+    std::vector<Task>sortedList;
+    for (Task task : tasks){
+        if (task.getPrio() == HIGH)
+            sortedList.push_back(task);
+    }
+    for (Task task : tasks){
+        if (task.getPrio() == MEDIUM)
+            sortedList.push_back(task);
+    }
+    for (Task task : tasks){
+        if (task.getPrio() == LOW)
+            sortedList.push_back(task);
+    }
+    tasks = sortedList;
+    sortedList.clear();
+}
+
+inline void Tasklist::display(){
+    int taskNumber = 0;
+    std::cout << "\n";
+    std::cout << "-------------------------------- " << name<<" --------------------------------\n";
+    for (Task task : tasks){
+        taskNumber++;
+        if (task.getPrio() == LOW)
+            std::cout << "🟩 ";
+        else if (task.getPrio() == MEDIUM)
+                std::cout << "🟨 ";
+        else std::cout << "🟥 ";
+
+        if (!task.getState())
+            std::cout << "󰄱 ";
+        else
+            std::cout << " ";
+
+        std::cout << task.getName();
+        for (int i=0; i<(60-task.getName().length()+name.length()+1 -1); i++)
+            std::cout << " ";
+        std::cout << taskNumber <<"\n";
+    }
+    std::cout << std::string(name.length()+1,'-')<< "-----------------------------------------------------------------\n";
 }

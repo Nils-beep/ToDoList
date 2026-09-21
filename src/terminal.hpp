@@ -1,17 +1,27 @@
 #pragma once
-#include "includes.hpp"
-#include <cassert>
+#include "tasklist.hpp"
 #include <vector>
+
+class Terminal;
 
 class MainWindow{
     private:
+
     public:
-        void run(){};
+        bool closeTerminal = false;
+        void run();
 };
 class TaskWindow{
     private:
+        int selectedTasklist = -1;
+        std::vector<Tasklist> tasklists;
+        int handleInput();
+        void readFile();
     public:
-        void run(){};
+        TaskWindow(){readFile();}
+        bool close;
+        void run(Terminal* terminal);
+        void writeFile();
 };
 class TimerWindow{
     private:
@@ -24,10 +34,10 @@ class Terminal {
         MainWindow mainWindow;
         TaskWindow taskWindow;
         TimerWindow timerWindow;
-        Window currentWindow;
+        Window currentWindow = TASKWINDOW;
 
-        bool close = false;
     public:
+        bool close = false;
         Window* changeWindow(Window newWindow){
             currentWindow = newWindow;
             return &currentWindow;
@@ -36,9 +46,10 @@ class Terminal {
             switch(currentWindow){
                 case MAINWINDOW:
                    mainWindow.run();
+                   close = mainWindow.closeTerminal;
                    break;
                 case TASKWINDOW:
-                    taskWindow.run();
+                    taskWindow.run(this);
                     break;
                 case TIMERWINDOW:
                     timerWindow.run();
@@ -46,3 +57,10 @@ class Terminal {
             }
         };
 };
+
+void inline MainWindow::run(){
+    std::string text;
+    std::getline(std::cin, text);
+    if (text == "")
+        closeTerminal = true;
+}
