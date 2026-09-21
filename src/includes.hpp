@@ -1,3 +1,4 @@
+#pragma once
 #include <cctype>
 #include <iostream>
 #include <istream>
@@ -29,3 +30,9 @@ enum Priority{
     MEDIUM,
     HIGH,
 };
+
+bool inline isInteger(const std::string& s) {
+    int value;
+    auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), value);
+    return ec == std::errc() && ptr == s.data() + s.size();
+}

@@ -1,5 +1,7 @@
+#include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
+
 
 
 void titleOutput(){
@@ -48,17 +50,40 @@ void TaskWindow::readFile(){
 */
 
 int TaskWindow::handleInput(){
-    std::cout << "👂️>";
+    std::cout<<"\n" << "👂️>";
     std::string text;
     std::getline(std::cin, text);
-    std::cout << "text=[" << text << "] selected=" << selectedTasklist << "\n";
-    if ((text == "") && (selectedTasklist == -1)){
-        std::cout << "got here\n";
-        return -1;
-    }
-    if (text == ""){
-        selectedTasklist = -1;
-        return 0;
+    if (selectedTasklist == -1){
+        if (text == ""){
+            std::cout << "got here\n";
+            return -1;
+        }
+        text.erase(remove_if(text.begin(), text.end(), isspace));
+        if (text.substr(0, 4) == "open"){
+            text = text.substr(4, text.length());
+            if ((text != "") && isInteger(text)){
+                if (stoi(text) <= (tasklists.size()))
+                    selectedTasklist = stoi(text) - 1;
+            }
+            return 0;
+        }
+        if (text.substr(0,3) == "new"){
+            text = text.substr(3, text.length());
+            if (text != "")
+                tasklists.push_back({text, LOW});
+            return 0;
+        }
+
+    }else{
+        if (text == ""){
+            selectedTasklist = -1;
+            return 0;
+        }
+        if (text.substr(0,3) == "new"){
+            text = text.substr(4, text.length());
+            tasklists[selectedTasklist].addTask(&text);
+        }
+
     }
     return 0;
 }
