@@ -1,5 +1,6 @@
 #pragma once
 #include "includes.hpp"
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -28,7 +29,10 @@ class Tasklist{
         std::vector<Task> tasks;
         void sortByPriority();
     public:
-        Tasklist(std::string n, Priority p){name = n; prio = p;}
+        Tasklist(std::string n){
+            findPriority(&n);
+            name = n;
+        }
         void addTask(std::string* line){
             tasks.push_back(line);
             sortByPriority();
@@ -66,7 +70,9 @@ inline void Tasklist::findPriority(std::string* line){
             line->erase(pos, 1);
         }
     }
-    this->tasks[stoi(*line)-1].changePrio(p);
+    if (this->tasks.empty())
+        this->prio = p;
+    else this->tasks[stoi(*line)-1].changePrio(p);
 }
 
 inline void Tasklist::sortByPriority(){

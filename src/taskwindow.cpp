@@ -1,10 +1,22 @@
 #include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
+#include <cstddef>
+#include <iterator>
 #include <string>
 #include <variant>
+#include <vector>
 
-
+bool findAndRemoveString(std::string* line, std::vector<std::string> words){
+    for (std::string word : words){
+        size_t pos = line->find(word);
+        if (pos != std::string::npos){
+            line->erase(pos, word.length());
+            return true;
+        }
+    }
+    return false;
+}
 
 void titleOutput(){
     std::ifstream myfile;
@@ -19,7 +31,7 @@ void TaskWindow::readFile(){
     for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(listFolder)){
         std::ifstream myfile;
         myfile.open(dirEntry.path());
-        tasklists.push_back({dirEntry.path().stem(), LOW});
+        tasklists.push_back({dirEntry.path().stem()});
         std::string line;
         while (getline(myfile, line)){
             tasklists[tasklists.size()-1].addTask(&line);
@@ -63,14 +75,19 @@ int TaskWindow::handleInput(){
             selectedTasklist = stoi(text)-1;
             return 0;
         }
-        if (text.substr(0,3) == "new"){
-            text = text.substr(3, text.length());
-            if (text != "")
-                tasklists.push_back({text, LOW});
+        if (findAndRemoveString(&text, {"del", "delete"})){
+            removeSpaces(&text);
+            int index = stoi(text);
+            std::string path = "tasklists/"+ tasklists[index-1].getName()+".txt";
+            std::cout << path <<"\n";
+            remove(path.c_str());
+            tasklists.erase(tasklists.begin()+index-1);
             return 0;
         }
-
-    }else{
+        tasklists.push_back({text});
+        return 0;
+    }
+    else{
         if (text == ""){
             selectedTasklist = -1;
             return 0;
