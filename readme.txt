@@ -1,3 +1,4 @@
 Tasklist programm for cli
 Everything should be self explanatory
-saves tasks in a tasklist.txt in the same folder
+saves tasks in tasklists folder
+folder will be automatically created on program start
