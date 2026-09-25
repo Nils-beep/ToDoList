@@ -11,10 +11,14 @@ bool findAndRemoveString(std::string* line, std::vector<std::string> words){
     for (std::string word : words){
         size_t pos = line->find(word);
         if (pos != std::string::npos){
-            line->erase(pos, word.length());
-            return true;
+            removeSpaces(line);
+            if (isInteger(line->substr(word.length(), line->length()-word.length()+1))){
+                line->erase(pos, word.length());
+                return true;
+            }
         }
     }
+
     return false;
 }
 
@@ -43,23 +47,25 @@ void TaskWindow::readFile(){
 void TaskWindow::writeFile(){
     int index = 0;
     for (Tasklist list : tasklists){
-        std::ofstream myfile;
-        std::string path = listFolder + "/" + list.getName() + ".txt";
-        myfile.open(path);
-        for (Task task : *tasklists[index].getTasks()){
-            if (!task.getState()){
-                myfile << task.getName();
-                if (task.getPrio() == HIGH)
-                myfile << "!!";
-                else
-                    if (task.getPrio() == MEDIUM)
-                        myfile << "!";
-                myfile << "\n";
+            std::ofstream myfile;
+            std::string path = listFolder + "/" + list.getName() + ".txt";
+            myfile.open(path);
+            for (Task task : *tasklists[index].getTasks()){
+                if (!task.getState()){
+                    myfile << task.getName();
+                    if (task.getPrio() == HIGH)
+                    myfile << "!!";
+                    else
+                        if (task.getPrio() == MEDIUM)
+                            myfile << "!";
+                    myfile << "\n";
+                }
             }
-        }
-        myfile.close();
-        index++;
+            myfile.close();
+            index++;
     }
+    for (Tasklist list : tasklists)
+        if (list.toDelete) list.deleteTasklist();
 }
 
 int TaskWindow::handleInput(){
@@ -68,20 +74,18 @@ int TaskWindow::handleInput(){
     std::getline(std::cin, text);
     if (selectedTasklist == -1){
         if (text == ""){
-            std::cout << "got here\n";
             return -1;
         }
         if (isInteger(text)){
             selectedTasklist = stoi(text)-1;
             return 0;
         }
-        if (findAndRemoveString(&text, {"del", "delete"})){
+        if (findAndRemoveString(&text, {"delete", "del"})){
             removeSpaces(&text);
+            std::cout << text+"\n";
             int index = stoi(text);
-            std::string path = "tasklists/"+ tasklists[index-1].getName()+".txt";
-            std::cout << path <<"\n";
-            remove(path.c_str());
-            tasklists.erase(tasklists.begin()+index-1);
+            tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
+            //tasklists.erase(tasklists.begin()+index-1);
             return 0;
         }
         tasklists.push_back({text});
