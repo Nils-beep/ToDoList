@@ -14,6 +14,12 @@
 #include <ranges>
 #include <vector>
 #include <string>
+#include <cstdlib>
+#include <unistd.h>
+#include <cwchar>
+#include <locale>
+#include <codecvt>
+
 
 #define CLEARSCREEN std::cout << "\033[2J\033[H";
 const std::string listFolder = "tasklists";
@@ -40,23 +46,6 @@ bool inline isInteger(const std::string& s) {
 void inline removeSpaces(std::string* text){
     text->erase(remove_if(text->begin(), text->end(), isspace), text->end());
 }
-
-#define color_black      0
-#define color_dark_blue  1
-#define color_dark_green 2
-#define color_light_blue 3
-#define color_dark_red   4
-#define color_magenta    5
-#define color_orange     6
-#define color_light_gray 7
-#define color_gray       8
-#define color_blue       9
-#define color_green     10
-#define color_cyan      11
-#define color_red       12
-#define color_pink      13
-#define color_yellow    14
-#define color_white     15
 
 using namespace std;
 
@@ -109,58 +98,93 @@ string inline get_backgroundcolor_code(const int backgroundcolor) { // Linux onl
     }
 }
 
-string inline get_print_color(const int textcolor) { // Linux only
-    return "\033["+get_textcolor_code(textcolor)+"m";
-}
-string inline get_print_color(const int textcolor, const int backgroundcolor) { // Linux only
-    return "\033["+get_textcolor_code(textcolor)+";"+get_backgroundcolor_code(backgroundcolor)+"m";
-}
-void inline print_color(const int textcolor) {
-#if defined(_WIN32)
-    static const HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(handle, textcolor);
-#elif defined(__linux__)
-    cout << get_print_color(textcolor);
-#endif // Windows/Linux
-}
-void inline print_color(const int textcolor, const int backgroundcolor) {
-#if defined(_WIN32)
-    static const HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(handle, backgroundcolor<<4|textcolor);
-#elif defined(__linux__)
-    cout << get_print_color(textcolor, backgroundcolor);
-#endif // Windows/Linux
-}
-void inline print_color_reset() {
-#if defined(_WIN32)
-    static const HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(handle, 7); // reset color
-#elif defined(__linux__)
-    cout << "\033[0m"; // reset color
-#endif // Windows/Linux
+struct Color {
+    int r;
+    int g;
+    int b;
+};
+
+constexpr Color color_red    {235, 105, 120};
+constexpr Color color_green  {120, 220, 145};
+constexpr Color color_yellow {245, 205, 95};
+
+constexpr Color color_pink   {235, 135, 190};
+constexpr Color color_gray   {180, 180, 180};
+constexpr Color color_white  {245, 245, 245};
+
+std::string inline get_print_color(const Color& color) {
+    return "\033[38;2;" +
+           std::to_string(color.r) + ";" +
+           std::to_string(color.g) + ";" +
+           std::to_string(color.b) + "m";
 }
 
-void inline println(const string& s="") {
-    cout << s << endl;
+std::string inline get_print_color(const Color& text, const Color& background) {
+    return "\033[38;2;" +
+           std::to_string(text.r) + ";" +
+           std::to_string(text.g) + ";" +
+           std::to_string(text.b) +
+           ";48;2;" +
+           std::to_string(background.r) + ";" +
+           std::to_string(background.g) + ";" +
+           std::to_string(background.b) + "m";
 }
-void inline print(const string& s="") {
-    cout << s;
+
+void inline print_color(const Color& textcolor) {
+#ifdef __linux__
+    std::cout << get_print_color(textcolor);
+#endif
 }
-void inline print(const string& s, const int textcolor) {
+
+void inline print_color(const Color& textcolor, const Color& backgroundcolor) {
+#ifdef __linux__
+    std::cout << get_print_color(textcolor, backgroundcolor);
+#endif
+}
+
+void inline print_color_reset() {
+#ifdef __linux__
+    std::cout << "\033[0m";
+#endif
+}
+
+void inline println(const std::string& s = "") {
+    std::cout << s << '\n';
+}
+
+void inline print(const std::string& s = "") {
+    std::cout << s;
+}
+
+void inline print(const std::string& s, const Color& textcolor) {
     print_color(textcolor);
-    cout << s;
+    std::cout << s;
     print_color_reset();
 }
-void inline print(const string& s, const int textcolor, const int backgroundcolor) {
+
+void inline print(
+    const std::string& s,
+    const Color& textcolor,
+    const Color& backgroundcolor
+) {
     print_color(textcolor, backgroundcolor);
-    cout << s;
+    std::cout << s;
     print_color_reset();
 }
-void inline print_no_reset(const string& s, const int textcolor) { // print with color, but don't reset color afterwards (faster)
+
+void inline print_no_reset(
+    const std::string& s,
+    const Color& textcolor
+) {
     print_color(textcolor);
-    cout << s;
+    std::cout << s;
 }
-void inline print_no_reset(const string& s, const int textcolor, const int backgroundcolor) { // print with color, but don't reset color afterwards (faster)
+
+void inline print_no_reset(
+    const std::string& s,
+    const Color& textcolor,
+    const Color& backgroundcolor
+) {
     print_color(textcolor, backgroundcolor);
-    cout << s;
+    std::cout << s;
 }

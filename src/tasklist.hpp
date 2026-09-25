@@ -1,6 +1,9 @@
 #pragma once
 #include "includes.hpp"
+#include <codecvt>
+#include <cwchar>
 #include <iterator>
+#include <locale>
 #include <string>
 #include <vector>
 
@@ -97,6 +100,19 @@ inline void Tasklist::sortByPriority(){
     tasks = sortedList;
     sortedList.clear();
 }
+
+size_t inline displayWidth(const std::string& s)
+{
+    size_t count = 0;
+
+    for (unsigned char c : s) {
+        if ((c & 0xC0) != 0x80)
+            ++count;
+    }
+
+    return count;
+}
+
 inline void Tasklist::display(){
     const int width = 85;
     int taskNumber = 0;
@@ -112,12 +128,12 @@ inline void Tasklist::display(){
     std::cout << "\n";
 
     for (Task task : tasks){
-        taskNumber++;
+        taskNumber++;/*
         if (task.getPrio() == LOW)
             std::cout << "🟩 ";
         else if (task.getPrio() == MEDIUM)
                 std::cout << "🟨 ";
-        else std::cout << "🟥 ";
+        else std::cout << "🟥 ";*/
 
         if (!task.getState())
             std::cout << "󰄱 ";
@@ -139,7 +155,7 @@ inline void Tasklist::display(){
                     break;
             }
 
-        for (int i=0; i<(width-task.getName().size()-6); i++) //-6 because emojis
+        for (int i=0; i<(width-displayWidth(task.getName())-4); i++) //-x because emojis
             std::cout << " ";
         std::cout << taskNumber <<"\n";
     }
