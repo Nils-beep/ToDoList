@@ -11,10 +11,14 @@ bool findAndRemoveString(std::string* line, std::vector<std::string> words){
     for (std::string word : words){
         size_t pos = line->find(word);
         if (pos != std::string::npos){
-            line->erase(pos, word.length());
-            return true;
+            removeSpaces(line);
+            if (isInteger(line->substr(word.length(), line->length()-word.length()+1))){
+                line->erase(pos, word.length());
+                return true;
+            }
         }
     }
+
     return false;
 }
 
@@ -76,8 +80,9 @@ int TaskWindow::handleInput(){
             selectedTasklist = stoi(text)-1;
             return 0;
         }
-        if (findAndRemoveString(&text, {"del", "delete"})){
+        if (findAndRemoveString(&text, {"delete", "del"})){
             removeSpaces(&text);
+            std::cout << text+"\n";
             int index = stoi(text);
             tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
             //tasklists.erase(tasklists.begin()+index-1);
