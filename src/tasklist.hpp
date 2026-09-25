@@ -27,11 +27,13 @@ class Tasklist{
         std::string name;
         Priority prio;
         std::vector<Task> tasks;
+        std::string filepath;
         void sortByPriority();
     public:
         Tasklist(std::string n){
             findPriority(&n);
             name = n;
+            filepath = "tasklists/" + name + ".txt";
         }
         void addTask(std::string* line){
             tasks.push_back(line);
@@ -40,8 +42,11 @@ class Tasklist{
         void toggleTask(int index){tasks[index].toggleTask();}
         void display();
         void findPriority(std::string* line);
+        void deleteTasklist(){remove(filepath.c_str());}
         std::vector<Task>* getTasks(){return &tasks;};
         std::string getName(){return name;}
+
+        bool toDelete = false;
 };
 
 inline void Task::findPriority(std::string* line){
@@ -93,9 +98,19 @@ inline void Tasklist::sortByPriority(){
     sortedList.clear();
 }
 inline void Tasklist::display(){
+    const int width = 85;
     int taskNumber = 0;
     std::cout << "\n";
-    std::cout << "-------------------------------- " << name<<" --------------------------------\n";
+    for (int i=0; i<((width-name.size())/2-1); i++)
+        std::cout << "-";
+    if (this->toDelete)
+        print(name, color_red);
+    else
+        print(" " +name + " ");
+    for (int i=0; i<((width-name.size())/2 -1); i++)
+        std::cout << "-";
+    std::cout << "\n";
+
     for (Task task : tasks){
         taskNumber++;
         if (task.getPrio() == LOW)
@@ -109,10 +124,24 @@ inline void Tasklist::display(){
         else
             std::cout << " ";
 
-        std::cout << task.getName();
-        for (int i=0; i<(60-task.getName().length()+name.length()+1 -1); i++)
+        if (this->toDelete)
+            print(task.getName(), color_red);
+        else
+            switch (task.getPrio()){
+                case LOW:
+                    print(task.getName(), color_green);
+                    break;
+                case MEDIUM:
+                    print(task.getName(), color_yellow);
+                    break;
+                case HIGH:
+                    print(task.getName(), color_red);
+                    break;
+            }
+
+        for (int i=0; i<(width-task.getName().size()-6); i++) //-6 because emojis
             std::cout << " ";
         std::cout << taskNumber <<"\n";
     }
-    std::cout << std::string(name.length()+1,'-')<< "-----------------------------------------------------------------\n";
+    std::cout << std::string(width,'-')+"\n";
 }
