@@ -7,6 +7,22 @@
 #include <string>
 #include <vector>
 
+Priority inline prioHelper(std::string* line){
+    Priority p = LOW;
+    const char prioChar = '!';
+    std::string::size_type pos = line->find(prioChar);
+    if (pos != std::string::npos){
+        p = MEDIUM;
+        line->erase(pos, 1);
+        pos = line->find(prioChar);
+        if (pos != std::string::npos){
+            p = HIGH;
+            line->erase(pos, 1);
+        }
+    }
+    return p;
+}
+
 class Task{
     private:
         std::string name;
@@ -53,35 +69,16 @@ class Tasklist{
 };
 
 inline void Task::findPriority(std::string* line){
-    Priority p = LOW;
-    std::string::size_type pos = line->find("!");
-    if (pos != std::string::npos){
-        p = MEDIUM;
-        line->erase(pos, 1);
-        pos = line->find("!");
-        if (pos != std::string::npos){
-            p = HIGH;
-            line->erase(pos, 1);
-        }
-    }
-    this->prio = p;
+    this->prio = prioHelper(line);
 }
 inline void Tasklist::findPriority(std::string* line){
-    Priority p = LOW;
-    std::string::size_type pos = line->find("!");
-    if (pos != std::string::npos){
-        p = MEDIUM;
-        line->erase(pos, 1);
-        pos = line->find("!");
-        if (pos != std::string::npos){
-            p = HIGH;
-            line->erase(pos, 1);
-        }
-    }
+    Priority p = prioHelper(line);
     if (this->tasks.empty())
         this->prio = p;
     else this->tasks[stoi(*line)-1].changePrio(p);
 }
+
+
 
 inline void Tasklist::sortByPriority(){
     std::vector<Task>sortedList;
@@ -104,12 +101,10 @@ inline void Tasklist::sortByPriority(){
 size_t inline displayWidth(const std::string& s)
 {
     size_t count = 0;
-
     for (unsigned char c : s) {
         if ((c & 0xC0) != 0x80)
             ++count;
     }
-
     return count;
 }
 
@@ -117,13 +112,13 @@ inline void Tasklist::display(){
     const int width = 85;
     int taskNumber = 0;
     std::cout << "\n";
-    for (int i=0; i<((width-name.size())/2-1); i++)
+    for (int i=0; i<((width-name.size())/2); i++)
         std::cout << "-";
     if (this->toDelete)
         print(name, color_red);
     else
         print(" " +name + " ");
-    for (int i=0; i<((width-name.size())/2 -1); i++)
+    for (int i=0; i<((width-name.size())/2 -2); i++)
         std::cout << "-";
     std::cout << "\n";
 
@@ -155,7 +150,7 @@ inline void Tasklist::display(){
                     break;
             }
 
-        for (int i=0; i<(width-displayWidth(task.getName())-4); i++) //-x because emojis
+        for (int i=0; i<(width-displayWidth(task.getName())-3); i++) //-x because emojis
             std::cout << " ";
         std::cout << taskNumber <<"\n";
     }
