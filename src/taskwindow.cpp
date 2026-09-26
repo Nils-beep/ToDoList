@@ -1,10 +1,10 @@
 #include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
-#include <cstddef>
 #include <iterator>
-#include <string>
 #include <variant>
+#include <cstddef>
+#include <string>
 #include <vector>
 
 bool findAndRemoveString(std::string* line, std::vector<std::string> words){

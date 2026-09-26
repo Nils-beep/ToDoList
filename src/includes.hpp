@@ -1,24 +1,24 @@
 #pragma once
-#include <cctype>
-#include <iostream>
-#include <istream>
-#include <list>
-#include <sstream>
-#include <string>
-#include <fstream>
-#include <variant>
-#include <vector>
 #include <bits/stdc++.h>
 #include <filesystem>
-#include <cassert>
-#include <ranges>
-#include <vector>
-#include <string>
-#include <cstdlib>
 #include <unistd.h>
-#include <cwchar>
-#include <locale>
+#include <iostream>
+#include <fstream>
+#include <istream>
+#include <sstream>
+#include <variant>
+#include <cassert>
 #include <codecvt>
+#include <cstdlib>
+#include <string>
+#include <cctype>
+#include <string>
+#include <ranges>
+#include <locale>
+#include <vector>
+#include <vector>
+#include <cwchar>
+#include <list>
 
 
 #define CLEARSCREEN std::cout << "\033[2J\033[H";
@@ -55,7 +55,7 @@ using namespace std;
 #include <Windows.h> // for displaying colors
 #endif // Windows
 
-string inline get_textcolor_code(const int textcolor) { // Linux only
+string inline get_textcolor_code(const int textcolor) {
     switch(textcolor) {
         case  0: return "30"; // color_black      0
         case  1: return "34"; // color_dark_blue  1
@@ -76,7 +76,7 @@ string inline get_textcolor_code(const int textcolor) { // Linux only
         default: return "37";
     }
 }
-string inline get_backgroundcolor_code(const int backgroundcolor) { // Linux only
+string inline get_backgroundcolor_code(const int backgroundcolor) {
     switch(backgroundcolor) {
         case  0: return  "40"; // color_black      0
         case  1: return  "44"; // color_dark_blue  1
@@ -107,7 +107,6 @@ struct Color {
 constexpr Color color_red    {235, 105, 120};
 constexpr Color color_green  {120, 220, 145};
 constexpr Color color_yellow {245, 205, 95};
-
 constexpr Color color_pink   {235, 135, 190};
 constexpr Color color_gray   {180, 180, 180};
 constexpr Color color_white  {245, 245, 245};
