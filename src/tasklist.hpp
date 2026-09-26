@@ -1,11 +1,11 @@
 #pragma once
 #include "includes.hpp"
-#include <codecvt>
-#include <cwchar>
 #include <iterator>
-#include <locale>
+#include <codecvt>
 #include <string>
+#include <cwchar>
 #include <vector>
+#include <locale>
 
 Priority inline prioHelper(std::string* line){
     Priority p = LOW;
