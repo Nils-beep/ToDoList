@@ -23,7 +23,7 @@
 #include <list>
 
 
-#define CLEARSCREEN std::cout << "\033[2J\033[H"
+#define CLEARSCREEN system("clear")
 #define DELETE {"del", "delete"}
 
 const std::string listFolder = "tasklists";
