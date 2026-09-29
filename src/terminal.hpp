@@ -1,5 +1,7 @@
 #pragma once
 #include "tasklist.hpp"
+#include <functional>
+#include <map>
 #include <vector>
 
 class Terminal;
@@ -17,6 +19,7 @@ class TaskWindow{
         std::vector<Tasklist> tasklists;
         int handleInput();
         void readFile();
+        bool findAndRemoveString(std::string* line, std::vector<std::string> words);
     public:
         TaskWindow(){readFile();}
         bool close;

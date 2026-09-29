@@ -109,16 +109,17 @@ size_t inline displayWidth(const std::string& s)
 }
 
 inline void Tasklist::display(){
-    const int width = 85;
+    const int width = 80;
     int taskNumber = 0;
     std::cout << "\n";
-    for (int i=0; i<((width-name.size())/2); i++)
+    for (int i=0; i<((width-displayWidth(name))/2); i++)
         std::cout << "-";
     if (this->toDelete)
         print(name, color_red);
     else
-        print(" " +name + " ");
-    for (int i=0; i<((width-name.size())/2 -2); i++)
+        print(" " + name + " ");
+    //without the double->rounding it sometimes has 1 - to little
+    for (int i=0; i<(round(double(width-displayWidth(name))/2) -2); i++)
         std::cout << "-";
     std::cout << "\n";
 
@@ -129,7 +130,6 @@ inline void Tasklist::display(){
         else if (task.getPrio() == MEDIUM)
                 std::cout << "🟨 ";
         else std::cout << "🟥 ";*/
-
         if (!task.getState())
             std::cout << "󰄱 ";
         else

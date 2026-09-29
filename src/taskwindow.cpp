@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-bool findAndRemoveString(std::string* line, std::vector<std::string> words){
+bool TaskWindow::findAndRemoveString(std::string* line, std::vector<std::string> words){
     for (std::string word : words){
         size_t pos = line->find(word);
         if (pos != std::string::npos){
@@ -18,7 +18,6 @@ bool findAndRemoveString(std::string* line, std::vector<std::string> words){
             }
         }
     }
-
     return false;
 }
 
@@ -80,7 +79,7 @@ int TaskWindow::handleInput(){
             selectedTasklist = stoi(text)-1;
             return 0;
         }
-        if (findAndRemoveString(&text, {"delete", "del"})){
+        if (this->findAndRemoveString(&text, DELETE)){
             removeSpaces(&text);
             std::cout << text+"\n";
             int index = stoi(text);
