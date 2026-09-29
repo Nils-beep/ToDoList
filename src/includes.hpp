@@ -28,14 +28,11 @@
 
 const std::string listFolder = "tasklists";
 
-
-
 enum Window{
     MAINWINDOW,
     TASKWINDOW,
     TIMERWINDOW,
 };
-
 
 enum Priority{
     LOW,

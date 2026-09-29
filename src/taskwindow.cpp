@@ -1,11 +1,35 @@
 #include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
+#include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <variant>
 #include <cstddef>
 #include <string>
 #include <vector>
+
+//return value is the command
+// 0: base info name or index
+// 1: always priorities TODO convert them here
+// 2-x: extra params
+std::string convertText(std::vector<std::string>* text){
+    std::string line = text->at(0);
+    if (isInteger(line))
+        return "selectList";
+    int index = line.find(" ");
+    std::string command = line.substr(0, index);
+    line = line.substr(index+1, line.length());
+    text->at(0) = line;
+    return command;
+}
+
+void TaskWindow::deleteList(std::vector<std::string> parameters){
+    std::cout << parameters[0] << "\n";
+    int index = stoi(parameters[0]);
+    tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
+    return;
+}
 
 bool TaskWindow::findAndRemoveString(std::string* line, std::vector<std::string> words){
     for (std::string word : words){
@@ -74,20 +98,21 @@ int TaskWindow::handleInput(){
     if (selectedTasklist == -1){
         if (text == ""){
             return -1;
-        }
+        }/*
         if (isInteger(text)){
             selectedTasklist = stoi(text)-1;
             return 0;
         }
         if (this->findAndRemoveString(&text, DELETE)){
-            removeSpaces(&text);
-            std::cout << text+"\n";
-            int index = stoi(text);
-            tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
+
             //tasklists.erase(tasklists.begin()+index-1);
             return 0;
         }
-        tasklists.push_back({text});
+        tasklists.push_back({text});*/
+        std::vector<std::string> arguments;
+        arguments.push_back(text);
+        std::string command = convertText(&arguments);
+        commandMap[command](arguments);
         return 0;
     }
     else{
@@ -110,7 +135,7 @@ int TaskWindow::handleInput(){
 }
 
 void TaskWindow::run(Terminal* terminal){
-    CLEARSCREEN;
+    //CLEARSCREEN;
     titleOutput();
     if (selectedTasklist == -1)
         for (Tasklist tasklist: tasklists){

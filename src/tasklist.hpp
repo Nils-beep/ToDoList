@@ -115,7 +115,7 @@ inline void Tasklist::display(){
     for (int i=0; i<((width-displayWidth(name))/2); i++)
         std::cout << "-";
     if (this->toDelete)
-        print(name, color_red);
+        print(" "+name+" ", color_red);
     else
         print(" " + name + " ");
     //without the double->rounding it sometimes has 1 - to little
