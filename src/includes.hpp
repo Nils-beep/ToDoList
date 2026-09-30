@@ -50,4 +50,10 @@ void inline removeSpaces(std::string* text){
     text->erase(remove_if(text->begin(), text->end(), isspace), text->end());
 }
 
+std::size_t inline number_of_files_in_directory(std::filesystem::path path)
+{
+    using std::filesystem::directory_iterator;
+    return std::distance(directory_iterator(path), directory_iterator{});
+}
+
 #include "colourStuff.hpp" //idk why i have to include it here I am crying

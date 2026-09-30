@@ -47,6 +47,7 @@ class Tasklist{
         Priority prio;
         std::vector<Task> tasks;
         std::string filepath;
+        bool hidden = false;
         void sortByPriority();
     public:
         Tasklist(std::string n){
@@ -64,6 +65,9 @@ class Tasklist{
         void deleteTasklist(){remove(filepath.c_str());}
         std::vector<Task>* getTasks(){return &tasks;};
         std::string getName(){return name;}
+        void setName(std::string name){this->name = name;}
+        void toggleHidden();
+        bool getHidden(){return hidden;}
 
         bool toDelete = false;
 };

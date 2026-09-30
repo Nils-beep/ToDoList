@@ -3,7 +3,9 @@
 #include "terminal.hpp"
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <iterator>
+#include <list>
 #include <variant>
 #include <cstddef>
 #include <string>
@@ -55,13 +57,18 @@ void titleOutput(){
 }
 
 void TaskWindow::readFile(){
+    int listAmount = int(number_of_files_in_directory(listFolder));
+    tasklists.resize(listAmount, Tasklist{""});
     for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(listFolder)){
         std::ifstream myfile;
         myfile.open(dirEntry.path());
-        tasklists.push_back({dirEntry.path().stem()});
+        //tasklists.push_back({dirEntry.path().stem()});
         std::string line;
+        getline(myfile, line);
+        int index = stoi(line.substr(0, line.find(",")));
+        tasklists[index].setName(dirEntry.path().stem());
         while (getline(myfile, line)){
-            tasklists[tasklists.size()-1].addTask(&line);
+            tasklists[index].addTask(&line);
             //std::cout << tasklists[tasklists.size()-1].tasks.back().name <<" " << tasklists[tasklists.size()-1].tasks.back().prio << "\n";
         }
         myfile.close();
@@ -73,6 +80,7 @@ void TaskWindow::writeFile(){
             std::ofstream myfile;
             std::string path = listFolder + "/" + list.getName() + ".txt";
             myfile.open(path);
+            myfile << index <<"," << list.getHidden() << ",\n";
             for (Task task : *tasklists[index].getTasks()){
                 if (!task.getState()){
                     myfile << task.getName();
@@ -135,7 +143,7 @@ int TaskWindow::handleInput(){
 }
 
 void TaskWindow::run(Terminal* terminal){
-    //CLEARSCREEN;
+    CLEARSCREEN;
     titleOutput();
     if (selectedTasklist == -1)
         for (Tasklist tasklist: tasklists){

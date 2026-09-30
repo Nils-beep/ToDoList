@@ -52,6 +52,7 @@ class TaskWindow{
             };
             commandMap["delete"] = deleteCommand;
             commandMap["del"] = deleteCommand;
+            commandMap["remove"] = deleteCommand;
             commandMap[""] = returnCommand;
             commandMap["selectList"] = selectCommand;
             commandMap["new"] = createListCommand;
