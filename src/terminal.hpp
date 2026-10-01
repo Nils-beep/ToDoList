@@ -16,47 +16,15 @@ class MainWindow{
 };
 class TaskWindow{
     private:
-        int selectedTasklist = -1;
         std::vector<Tasklist> tasklists;
         int handleInput();
         void readFile();
         bool findAndRemoveString(std::string* line, std::vector<std::string> words);
-        void deleteList(std::vector<std::string> parameters);
-        std::map<std::string, std::function<void(std::vector<std::string>)>> commandMap;
+        void deleteList(std::string parameters[parameterAmount]);
+        std::map<std::string, std::function<void(std::string[parameterAmount])>> commandMap;
 
     public:
-        TaskWindow(){
-            readFile();
-            auto deleteCommand = [this](std::vector<std::string> parameters){
-                deleteList(parameters);
-            };
-            auto returnCommand = [this](std::vector<std::string> parameters){
-                selectedTasklist = -1;
-            };
-            auto selectCommand = [this](std::vector<std::string> parameters){
-                int index = stoi(parameters[0]) - 1;
-                if ((index >= 0) && (index < tasklists.size()))
-                    selectedTasklist = index;
-            };
-            auto createListCommand = [this](std::vector<std::string> parameters){
-                switch (tasklists.size()){
-                    case 1:
-                        tasklists.push_back(parameters[0]);
-                        break;
-                    case 2:
-                        tasklists.push_back(parameters[0]);
-                        tasklists.back().findPriority(&parameters[1]);
-                        break;
-                }
-                tasklists.push_back(parameters[0]);
-            };
-            commandMap["delete"] = deleteCommand;
-            commandMap["del"] = deleteCommand;
-            commandMap["remove"] = deleteCommand;
-            commandMap[""] = returnCommand;
-            commandMap["selectList"] = selectCommand;
-            commandMap["new"] = createListCommand;
-        }
+        TaskWindow();
         bool close;
         void run(Terminal* terminal);
         void writeFile();
@@ -95,6 +63,32 @@ class Terminal {
             }
         };
 };
+
+inline TaskWindow::TaskWindow(){
+    readFile();
+    auto deleteCommand = [this](std::string parameters[parameterAmount]){
+        deleteList(parameters);
+    };
+    auto returnCommand = [this](std::string parameters[parameterAmount]){
+        selectedTasklist = -1;
+    };
+    auto selectCommand = [this](std::string parameters[parameterAmount]){
+        int index = stoi(parameters[mainData]) - 1;
+        if ((index >= 0) && (index < tasklists.size()))
+            selectedTasklist = index;
+    };
+    auto createListCommand = [this](std::string parameters[parameterAmount]){
+        tasklists.push_back({parameters[mainData], int(tasklists.size())});
+        if (parameters[hiddenState] == "true")
+            tasklists[tasklists.size()-1].toggleHidden();
+    };
+    commandMap["delete"] = deleteCommand;
+    commandMap["del"] = deleteCommand;
+    commandMap["remove"] = deleteCommand;
+    commandMap[""] = returnCommand;
+    commandMap["selectList"] = selectCommand;
+    commandMap["new"] = createListCommand;
+}
 
 void inline MainWindow::run(){
     std::string text;

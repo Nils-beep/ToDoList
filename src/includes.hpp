@@ -26,7 +26,10 @@
 #define CLEARSCREEN system("clear")
 #define DELETE {"del", "delete"}
 
+const int parameterAmount = 5;
 const std::string listFolder = "tasklists";
+
+inline int selectedTasklist = -1;
 
 enum Window{
     MAINWINDOW,

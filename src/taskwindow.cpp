@@ -11,24 +11,36 @@
 #include <string>
 #include <vector>
 
+
+bool eraseSubstring(std::string* line, std::string subStr){
+    int length = subStr.length();
+    std::size_t pos = line->find(subStr);
+
+    if (pos == std::string::npos)
+        return false;
+    std::string subString = line->substr(pos, length);
+    line->erase(pos-1, length); //-1 to remove the space
+    return true;
+}
 //return value is the command
 // 0: base info name or index
 // 1: always priorities TODO convert them here
-// 2-x: extra params
-std::string convertText(std::vector<std::string>* text){
-    std::string line = text->at(0);
+// 2: -h hidden   erguhi -h
+std::string convertText(std::string (*text)[parameterAmount]){
+    std::string line = (*text)[mainData];
     if (isInteger(line))
         return "selectList";
-    int index = line.find(" ");
-    std::string command = line.substr(0, index);
-    line = line.substr(index+1, line.length());
-    text->at(0) = line;
+    std::string command = line.substr(0, line.find(" "));
+    line = line.substr(line.find(" ")+1);
+    if (eraseSubstring(&line, "-h"))
+        (*text)[hiddenState] = "true";
+    (*text)[mainData] = line;
     return command;
 }
 
-void TaskWindow::deleteList(std::vector<std::string> parameters){
-    std::cout << parameters[0] << "\n";
-    int index = stoi(parameters[0]);
+void TaskWindow::deleteList(std::string parameters[5]){
+    std::cout << parameters[mainData] << "\n";
+    int index = stoi(parameters[mainData]);
     tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
     return;
 }
@@ -58,7 +70,7 @@ void titleOutput(){
 
 void TaskWindow::readFile(){
     int listAmount = int(number_of_files_in_directory(listFolder));
-    tasklists.resize(listAmount, Tasklist{""});
+    tasklists.resize(listAmount, Tasklist{"", 0});
     for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(listFolder)){
         std::ifstream myfile;
         myfile.open(dirEntry.path());
@@ -66,7 +78,11 @@ void TaskWindow::readFile(){
         std::string line;
         getline(myfile, line);
         int index = stoi(line.substr(0, line.find(",")));
+        bool hidden = stoi(line.substr(2, line.find(",")));
         tasklists[index].setName(dirEntry.path().stem());
+        tasklists[index].setIndex(index);
+        if (hidden)
+            tasklists[index].toggleHidden();
         while (getline(myfile, line)){
             tasklists[index].addTask(&line);
             //std::cout << tasklists[tasklists.size()-1].tasks.back().name <<" " << tasklists[tasklists.size()-1].tasks.back().prio << "\n";
@@ -106,19 +122,11 @@ int TaskWindow::handleInput(){
     if (selectedTasklist == -1){
         if (text == ""){
             return -1;
-        }/*
-        if (isInteger(text)){
-            selectedTasklist = stoi(text)-1;
-            return 0;
         }
-        if (this->findAndRemoveString(&text, DELETE)){
 
-            //tasklists.erase(tasklists.begin()+index-1);
-            return 0;
-        }
-        tasklists.push_back({text});*/
-        std::vector<std::string> arguments;
-        arguments.push_back(text);
+        std::string arguments[5] = {"-","-","-","-","-"};
+        std::cout << arguments[3] << "\n";
+        arguments[0] = text;
         std::string command = convertText(&arguments);
         commandMap[command](arguments);
         return 0;
@@ -143,7 +151,7 @@ int TaskWindow::handleInput(){
 }
 
 void TaskWindow::run(Terminal* terminal){
-    CLEARSCREEN;
+    //CLEARSCREEN;
     titleOutput();
     if (selectedTasklist == -1)
         for (Tasklist tasklist: tasklists){

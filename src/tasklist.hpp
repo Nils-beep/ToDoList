@@ -7,6 +7,8 @@
 #include <vector>
 #include <locale>
 
+
+
 Priority inline prioHelper(std::string* line){
     Priority p = LOW;
     const char prioChar = '!';
@@ -22,6 +24,13 @@ Priority inline prioHelper(std::string* line){
     }
     return p;
 }
+
+enum paramIndex{
+    mainData,
+    extraInfo,
+    hiddenState,
+    withDate
+};
 
 class Task{
     private:
@@ -48,12 +57,14 @@ class Tasklist{
         std::vector<Task> tasks;
         std::string filepath;
         bool hidden = false;
+        int index;
         void sortByPriority();
     public:
-        Tasklist(std::string n){
+        Tasklist(std::string n, int index){
             findPriority(&n);
             name = n;
             filepath = "tasklists/" + name + ".txt";
+            this->index = index;
         }
         void addTask(std::string* line){
             tasks.push_back(line);
@@ -66,8 +77,10 @@ class Tasklist{
         std::vector<Task>* getTasks(){return &tasks;};
         std::string getName(){return name;}
         void setName(std::string name){this->name = name;}
-        void toggleHidden();
+        void toggleHidden(){hidden = !hidden;};
         bool getHidden(){return hidden;}
+        int getIndex(){return index;}
+        void setIndex(int index){this->index = index;}
 
         bool toDelete = false;
 };
@@ -81,8 +94,6 @@ inline void Tasklist::findPriority(std::string* line){
         this->prio = p;
     else this->tasks[stoi(*line)-1].changePrio(p);
 }
-
-
 
 inline void Tasklist::sortByPriority(){
     std::vector<Task>sortedList;
@@ -116,47 +127,45 @@ inline void Tasklist::display(){
     const int width = 80;
     int taskNumber = 0;
     std::cout << "\n";
-    for (int i=0; i<((width-displayWidth(name))/2); i++)
+    for (int i=0; i<((width-displayWidth(name))/2-3); i++)
         std::cout << "-";
     if (this->toDelete)
-        print(" "+name+" ", color_red);
+        print(" "+ to_string(index+1) + ". " + name+" ", color_red);
     else
-        print(" " + name + " ");
+        print(" "+ to_string(index+1) + ". " + name + " ");
     //without the double->rounding it sometimes has 1 - to little
     for (int i=0; i<(round(double(width-displayWidth(name))/2) -2); i++)
         std::cout << "-";
     std::cout << "\n";
+    if (!this->hidden || (selectedTasklist != -1)){
+        for (Task task : tasks){
+            taskNumber++;
+            if (taskNumber>9){
+                std::cout<< "| " << taskNumber  << "";
+            }else std::cout<< "| " << taskNumber << " ";
+            if (!task.getState())
+                std::cout << "󰄱 ";
+            else
+                std::cout << " ";
 
-    for (Task task : tasks){
-        taskNumber++;/*
-        if (task.getPrio() == LOW)
-            std::cout << "🟩 ";
-        else if (task.getPrio() == MEDIUM)
-                std::cout << "🟨 ";
-        else std::cout << "🟥 ";*/
-        if (!task.getState())
-            std::cout << "󰄱 ";
-        else
-            std::cout << " ";
-
-        if (this->toDelete)
-            print(task.getName(), color_red);
-        else
-            switch (task.getPrio()){
-                case LOW:
-                    print(task.getName(), color_green);
-                    break;
-                case MEDIUM:
-                    print(task.getName(), color_yellow);
-                    break;
-                case HIGH:
-                    print(task.getName(), color_red);
-                    break;
-            }
-
-        for (int i=0; i<(width-displayWidth(task.getName())-3); i++) //-x because emojis
-            std::cout << " ";
-        std::cout << taskNumber <<"\n";
-    }
+            if (this->toDelete)
+                print(task.getName(), color_red);
+            else
+                switch (task.getPrio()){
+                    case LOW:
+                        print(task.getName(), color_green);
+                        break;
+                    case MEDIUM:
+                        print(task.getName(), color_yellow);
+                        break;
+                    case HIGH:
+                        print(task.getName(), color_red);
+                        break;
+                }
+            for (int i=0; i<(width-displayWidth(task.getName())-7); i++) //-x because emojis
+                std::cout << " ";
+            std::cout <<"|\n";
+        }
+    }else std::cout << "🦚 hidden 🦚" << std::string(width-13,' ')+"|\n";
     std::cout << std::string(width,'-')+"\n";
 }
