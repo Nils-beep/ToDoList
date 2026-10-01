@@ -124,17 +124,17 @@ size_t inline displayWidth(const std::string& s)
 }
 
 inline void Tasklist::display(){
-    const int width = 80;
+
     int taskNumber = 0;
     std::cout << "\n";
-    for (int i=0; i<((width-displayWidth(name))/2-3); i++)
+    for (int i=0; i<((tasklistWidth-displayWidth(name))/2-3); i++)
         std::cout << "-";
     if (this->toDelete)
         print(" "+ to_string(index+1) + ". " + name+" ", color_red);
     else
         print(" "+ to_string(index+1) + ". " + name + " ");
     //without the double->rounding it sometimes has 1 - to little
-    for (int i=0; i<(round(double(width-displayWidth(name))/2) -2); i++)
+    for (int i=0; i<(round(double(tasklistWidth-displayWidth(name))/2) -2); i++)
         std::cout << "-";
     std::cout << "\n";
     if (!this->hidden || (selectedTasklist != -1)){
@@ -162,10 +162,11 @@ inline void Tasklist::display(){
                         print(task.getName(), color_red);
                         break;
                 }
-            for (int i=0; i<(width-displayWidth(task.getName())-7); i++) //-x because emojis
+            for (int i=0; i<(tasklistWidth-displayWidth(task.getName())-7); i++) //-x because emojis
                 std::cout << " ";
             std::cout <<"|\n";
         }
-    }else std::cout << "🦚 hidden 🦚" << std::string(width-13,' ')+"|\n";
-    std::cout << std::string(width,'-')+"\n";
+    }else std::cout<< "|"<< std::string((tasklistWidth)/2-displayWidth("🦚 hidden 🦚")/2-3,' ')
+            << "🦚 hidden 🦚" << std::string(tasklistWidth/2-displayWidth("🦚 hidden 🦚")/2-1,' ')+"|\n";
+    std::cout << std::string(tasklistWidth,'-')+"\n";
 }

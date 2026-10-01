@@ -64,7 +64,7 @@ void titleOutput(){
     myfile.open("title.txt");
     std::string line;
     while (getline(myfile, line))
-        std::cout<< line << "\n";
+        std::cout<< std::string(int(tasklistWidth/5),' ') << line << "\n";
     myfile.close();
 }
 
@@ -151,7 +151,7 @@ int TaskWindow::handleInput(){
 }
 
 void TaskWindow::run(Terminal* terminal){
-    //CLEARSCREEN;
+    CLEARSCREEN;
     titleOutput();
     if (selectedTasklist == -1)
         for (Tasklist tasklist: tasklists){

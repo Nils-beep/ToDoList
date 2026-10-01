@@ -28,6 +28,7 @@
 
 const int parameterAmount = 5;
 const std::string listFolder = "tasklists";
+const int tasklistWidth = 80;
 
 inline int selectedTasklist = -1;
 
