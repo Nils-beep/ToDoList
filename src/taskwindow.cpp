@@ -40,7 +40,7 @@ std::string convertText(std::string (*text)[parameterAmount]){
     line = line.substr(line.find(" ")+1);
     if (eraseSubstring(&line, "-h", -1))
         (*text)[hiddenState] = "true";
-    if (command == "swap"){
+    if ((command == "swap") || (command == "switch")){
         (*text)[mainData] = line.substr(0, line.find(" "));
         line = line.substr(line.find(" ")+1);
         (*text)[extraInfo] = line.substr(0, line.find(" "));
@@ -108,6 +108,10 @@ void TaskWindow::readFile(){
 void TaskWindow::writeFile(){
     int index = 0;
     for (Tasklist list : tasklists){
+            if (list.toDelete){
+                list.deleteTasklist();
+                continue;
+            }
             std::ofstream myfile;
             std::string path = tasklistFolder + "/" + list.getName() + ".txt";
             myfile.open(path);
@@ -116,7 +120,7 @@ void TaskWindow::writeFile(){
                 if (!task.getState()){
                     myfile << task.getName();
                     if (task.getPrio() == HIGH)
-                    myfile << "!!";
+                        myfile << "!!";
                     else
                         if (task.getPrio() == MEDIUM)
                             myfile << "!";
@@ -126,8 +130,6 @@ void TaskWindow::writeFile(){
             myfile.close();
             index++;
     }
-    for (Tasklist list : tasklists)
-        if (list.toDelete) list.deleteTasklist();
 }
 
 int TaskWindow::handleInput(){
@@ -176,7 +178,7 @@ void TaskWindow::run(Terminal* terminal){
     if (next == -1){
         terminal->changeWindow(MAINWINDOW);
         writeFile();
-        CLEARSCREEN;
+        //CLEARSCREEN;
         titleOutput();
         for (Tasklist tasklist: tasklists)
             tasklist.display();
