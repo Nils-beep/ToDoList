@@ -26,16 +26,26 @@
 #define CLEARSCREEN system("clear")
 #define DELETE {"del", "delete"}
 
-const std::string listFolder = "tasklists";
+const std::string pathToData = std::getenv("XDG_DATA_HOME");
+const std::string tasklistFolder = pathToData + "/Tasker";
 
+const int parameterAmount = 5;
+const int tasklistWidth = 80;
 
+inline int selectedTasklist = -1;
+
+enum paramIndex{
+    mainData,
+    extraInfo,
+    hiddenState,
+    withDate
+};
 
 enum Window{
     MAINWINDOW,
     TASKWINDOW,
     TIMERWINDOW,
 };
-
 
 enum Priority{
     LOW,
@@ -51,6 +61,12 @@ bool inline isInteger(const std::string& s) {
 
 void inline removeSpaces(std::string* text){
     text->erase(remove_if(text->begin(), text->end(), isspace), text->end());
+}
+
+std::size_t inline number_of_files_in_directory(std::filesystem::path path)
+{
+    using std::filesystem::directory_iterator;
+    return std::distance(directory_iterator(path), directory_iterator{});
 }
 
 #include "colourStuff.hpp" //idk why i have to include it here I am crying
