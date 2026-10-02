@@ -26,8 +26,10 @@
 #define CLEARSCREEN system("clear")
 #define DELETE {"del", "delete"}
 
+const std::string pathToData = std::getenv("XDG_DATA_HOME");
+const std::string tasklistFolder = pathToData + "/Tasker";
+
 const int parameterAmount = 5;
-const std::string listFolder = "tasklists";
 const int tasklistWidth = 80;
 
 inline int selectedTasklist = -1;

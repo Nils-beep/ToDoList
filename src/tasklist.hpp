@@ -106,8 +106,7 @@ inline void Tasklist::sortByPriority(){
     sortedList.clear();
 }
 
-size_t inline displayWidth(const std::string& s)
-{
+size_t inline displayWidth(const std::string& s){
     size_t count = 0;
     for (unsigned char c : s) {
         if ((c & 0xC0) != 0x80)
@@ -117,7 +116,6 @@ size_t inline displayWidth(const std::string& s)
 }
 
 inline void Tasklist::display(){
-
     int taskNumber = 0;
     std::cout << "\n";
     for (int i=0; i<((tasklistWidth-displayWidth(name))/2-3); i++)

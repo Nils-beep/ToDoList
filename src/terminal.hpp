@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Terminal;
@@ -104,12 +105,15 @@ inline TaskWindow::TaskWindow(){
     commandMap["create"] = createListCommand;
     commandMap["hide"] = hideListCommand;
     commandMap["swap"] = swapListsCommand;
+    commandMap["switch"] = swapListsCommand;
 }
 
 void inline MainWindow::run(){
+    closeTerminal = true;
+    return;
     std::string text;
     std::getline(std::cin, text);
     if (text == ""){
-        closeTerminal = true;
+
     }
 }
