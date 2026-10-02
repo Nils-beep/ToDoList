@@ -178,7 +178,7 @@ void TaskWindow::run(Terminal* terminal){
     if (next == -1){
         terminal->changeWindow(MAINWINDOW);
         writeFile();
-        //CLEARSCREEN;
+        CLEARSCREEN;
         titleOutput();
         for (Tasklist tasklist: tasklists)
             tasklist.display();
