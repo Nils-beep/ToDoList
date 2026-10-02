@@ -25,13 +25,6 @@ Priority inline prioHelper(std::string* line){
     return p;
 }
 
-enum paramIndex{
-    mainData,
-    extraInfo,
-    hiddenState,
-    withDate
-};
-
 class Task{
     private:
         std::string name;

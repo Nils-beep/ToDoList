@@ -32,6 +32,13 @@ const int tasklistWidth = 80;
 
 inline int selectedTasklist = -1;
 
+enum paramIndex{
+    mainData,
+    extraInfo,
+    hiddenState,
+    withDate
+};
+
 enum Window{
     MAINWINDOW,
     TASKWINDOW,

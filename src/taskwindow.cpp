@@ -12,19 +12,25 @@
 #include <vector>
 
 
-bool eraseSubstring(std::string* line, std::string subStr){
-    int length = subStr.length();
-    std::size_t pos = line->find(subStr);
+bool eraseSubstring(std::string* line, std::string subStr, int subPos){
+    int length = 0;
+    std::size_t pos = std::string::npos;
+    if (subPos != -1){
+        int length = subStr.length();
+        std::size_t pos = line->find(subStr);
 
-    if (pos == std::string::npos)
-        return false;
-    std::string subString = line->substr(pos, length);
-    line->erase(pos-1, length); //-1 to remove the space
+        if (pos == std::string::npos)
+            return false;
+        std::string subString = line->substr(pos, length);
+        line->erase(pos-1, length); //-1 to remove the space
+    } else{
+
+    }
     return true;
 }
 //return value is the command
 // 0: base info name or index
-// 1: always priorities TODO convert them here
+// 1: secondary info
 // 2: -h hidden   erguhi -h
 std::string convertText(std::string (*text)[parameterAmount]){
     std::string line = (*text)[mainData];
@@ -32,8 +38,16 @@ std::string convertText(std::string (*text)[parameterAmount]){
         return "selectList";
     std::string command = line.substr(0, line.find(" "));
     line = line.substr(line.find(" ")+1);
-    if (eraseSubstring(&line, "-h"))
+    if (eraseSubstring(&line, "-h", -1))
         (*text)[hiddenState] = "true";
+    if (command == "swap"){
+        (*text)[mainData] = line.substr(0, line.find(" "));
+        line = line.substr(line.find(" ")+1);
+        (*text)[extraInfo] = line.substr(0, line.find(" "));
+        line = line.substr(line.find(" ")+1);
+        std::cout << "got here\n";
+        return command;
+    }
     (*text)[mainData] = line;
     return command;
 }
@@ -125,7 +139,6 @@ int TaskWindow::handleInput(){
         }
 
         std::string arguments[5] = {"-","-","-","-","-"};
-        std::cout << arguments[3] << "\n";
         arguments[0] = text;
         std::string command = convertText(&arguments);
         commandMap[command](arguments);

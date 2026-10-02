@@ -1,4 +1,5 @@
 #pragma once
+#include "includes.hpp"
 #include "tasklist.hpp"
 #include <functional>
 #include <map>
@@ -82,12 +83,27 @@ inline TaskWindow::TaskWindow(){
         if (parameters[hiddenState] == "true")
             tasklists[tasklists.size()-1].toggleHidden();
     };
+    auto hideListCommand = [this](std::string parameters[parameterAmount]){
+        tasklists[stoi(parameters[mainData])-1].toggleHidden();
+    };
+    auto swapListsCommand = [this](std::string parameters[parameterAmount]){
+        std::cout << parameters[mainData] << ";" << parameters[extraInfo] << ";\n";
+        Tasklist tasklist = tasklists[stoi(parameters[mainData])-1];
+        tasklists[stoi(parameters[mainData])-1] = tasklists[stoi(parameters[extraInfo])-1];
+        tasklists[stoi(parameters[extraInfo])-1] = tasklist;
+        tasklists[stoi(parameters[mainData])-1].setIndex(stoi(parameters[mainData])-1);
+        tasklists[stoi(parameters[extraInfo])-1].setIndex(stoi(parameters[extraInfo])-1);
+    };
+
     commandMap["delete"] = deleteCommand;
     commandMap["del"] = deleteCommand;
     commandMap["remove"] = deleteCommand;
     commandMap[""] = returnCommand;
     commandMap["selectList"] = selectCommand;
     commandMap["new"] = createListCommand;
+    commandMap["create"] = createListCommand;
+    commandMap["hide"] = hideListCommand;
+    commandMap["swap"] = swapListsCommand;
 }
 
 void inline MainWindow::run(){
