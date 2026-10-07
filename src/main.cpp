@@ -3,6 +3,8 @@
 #include <filesystem>
 
 int main(){
+    setupLinenoise();
+    commandWordsinitializer();
     std::string folderPath = pathToData + "/Tasker";
     if (!std::filesystem::exists(folderPath))
         std::filesystem::create_directory(folderPath);

@@ -21,7 +21,8 @@
 #include <vector>
 #include <cwchar>
 #include <list>
-
+#include "linenoise.hpp"
+#include "linenoiseStuff.hpp"
 
 #define CLEARSCREEN system("clear")
 #define DELETE {"del", "delete"}
@@ -52,6 +53,19 @@ enum Priority{
     MEDIUM,
     HIGH,
 };
+
+inline std::string deleteCommands[] = {"delete", "destroy", "remove"};
+inline std::string makeCommands[] = {"new", "create", "make"};
+inline std::string selectCommands[] = {"select", "choose", "pick"};
+inline std::string hideCommands[] = {"hide", "show"};
+inline std::vector<std::string> commandWords;
+
+void inline commandWordsinitializer(){
+    commandWords.insert(commandWords.end(), std::begin(deleteCommands), std::end(deleteCommands));
+    commandWords.insert(commandWords.end(), std::begin(makeCommands), std::end(makeCommands));
+    commandWords.insert(commandWords.end(), std::begin(selectCommands), std::end(selectCommands));
+    commandWords.insert(commandWords.end(), std::begin(hideCommands), std::end(hideCommands));
+}
 
 bool inline isInteger(const std::string& s) {
     int value;

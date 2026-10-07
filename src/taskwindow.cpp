@@ -1,4 +1,4 @@
-#include "includes.hpp"
+ #include "includes.hpp"
 #include "tasklist.hpp"
 #include "terminal.hpp"
 #include <algorithm>
@@ -118,13 +118,16 @@ void TaskWindow::writeFile(){
 }
 
 int TaskWindow::handleInput(){
-    std::cout<<"\n" << "👂️> ";
-    std::string text;
-    std::getline(std::cin, text);
+    linenoise::LoadHistory("history.txt");
+    std::string text = "";
+    std::cout << "\n";
+    linenoise::Readline("> ", text);
+    linenoise::AddHistory(text.c_str());
+    linenoise::SaveHistory("history.txt");
+
     if (selectedTasklist == -1){
-        if (text == ""){
+        if (text == "")
             return -1;
-        }
         std::string command = convertText(&text);
         commandMap[command](text);
         return 0;

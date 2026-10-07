@@ -75,8 +75,8 @@ inline TaskWindow::TaskWindow(){
         selectedTasklist = -1;
     };
     auto selectCommand = [this](std::string parameters){
-        int index = stoi(parameters.substr(0,parameters.find(" ")));
-        if ((index >= 0) && (index < tasklists.size()))
+        int index = stoi(parameters.substr(0,parameters.find(" ")))-1;
+        if (((index) >= 0) && ((index) < tasklists.size()))
             selectedTasklist = index;
     };
     auto createListCommand = [this](std::string parameters){
@@ -90,19 +90,16 @@ inline TaskWindow::TaskWindow(){
         tasklists[stoi(parameters)-1].toggleHidden();
     };
     auto swapListsCommand = [this](std::string parameters){
-        std::cout << parameters << "\n";
         int list1 = stoi(parameters.substr(0,parameters.find(" ")))-1;
-        std::cout << parameters << "     " << list1 << "\n";
         parameters = parameters.substr(parameters.find(" ")+1);
         int list2 = stoi(parameters)-1;
-        std::cout << parameters << "     " << list2 << "\n";
         Tasklist tasklist = tasklists[list1];
         tasklists[list1] = tasklists[list2];
         tasklists[list2] = tasklist;
         tasklists[list1].setIndex(list1);
         tasklists[list2].setIndex(list2);
     };
-
+    //for (std::string word deleteCommands)
     commandMap["delete"] = deleteCommand;
     commandMap["del"] = deleteCommand;
     commandMap["remove"] = deleteCommand;
