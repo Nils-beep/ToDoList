@@ -22,8 +22,8 @@ class TaskWindow{
         int handleInput();
         void readFile();
         bool findAndRemoveString(std::string* line, std::vector<std::string> words);
-        void deleteList(std::string parameters[parameterAmount]);
-        std::map<std::string, std::function<void(std::string[parameterAmount])>> commandMap;
+        void deleteList(std::string parameters);
+        std::map<std::string, std::function<void(std::string)>> commandMap;
 
     public:
         TaskWindow();
@@ -68,32 +68,39 @@ class Terminal {
 
 inline TaskWindow::TaskWindow(){
     readFile();
-    auto deleteCommand = [this](std::string parameters[parameterAmount]){
+    auto deleteCommand = [this](std::string parameters){
         deleteList(parameters);
     };
-    auto returnCommand = [this](std::string parameters[parameterAmount]){
+    auto returnCommand = [this](std::string parameters){
         selectedTasklist = -1;
     };
-    auto selectCommand = [this](std::string parameters[parameterAmount]){
-        int index = stoi(parameters[mainData]) - 1;
+    auto selectCommand = [this](std::string parameters){
+        int index = stoi(parameters.substr(0,parameters.find(" ")));
         if ((index >= 0) && (index < tasklists.size()))
             selectedTasklist = index;
     };
-    auto createListCommand = [this](std::string parameters[parameterAmount]){
-        tasklists.push_back({parameters[mainData], int(tasklists.size())});
-        if (parameters[hiddenState] == "true")
+    auto createListCommand = [this](std::string parameters){
+        std::string listName = parameters.substr(0,parameters.find(" "));
+        parameters = parameters.substr(parameters.find(" ")+1); //this should only leave hidden //todo dates and shit
+        tasklists.push_back({listName, int(tasklists.size())});
+        if (parameters == "-h")
             tasklists[tasklists.size()-1].toggleHidden();
     };
-    auto hideListCommand = [this](std::string parameters[parameterAmount]){
-        tasklists[stoi(parameters[mainData])-1].toggleHidden();
+    auto hideListCommand = [this](std::string parameters){
+        tasklists[stoi(parameters)-1].toggleHidden();
     };
-    auto swapListsCommand = [this](std::string parameters[parameterAmount]){
-        std::cout << parameters[mainData] << ";" << parameters[extraInfo] << ";\n";
-        Tasklist tasklist = tasklists[stoi(parameters[mainData])-1];
-        tasklists[stoi(parameters[mainData])-1] = tasklists[stoi(parameters[extraInfo])-1];
-        tasklists[stoi(parameters[extraInfo])-1] = tasklist;
-        tasklists[stoi(parameters[mainData])-1].setIndex(stoi(parameters[mainData])-1);
-        tasklists[stoi(parameters[extraInfo])-1].setIndex(stoi(parameters[extraInfo])-1);
+    auto swapListsCommand = [this](std::string parameters){
+        std::cout << parameters << "\n";
+        int list1 = stoi(parameters.substr(0,parameters.find(" ")))-1;
+        std::cout << parameters << "     " << list1 << "\n";
+        parameters = parameters.substr(parameters.find(" ")+1);
+        int list2 = stoi(parameters)-1;
+        std::cout << parameters << "     " << list2 << "\n";
+        Tasklist tasklist = tasklists[list1];
+        tasklists[list1] = tasklists[list2];
+        tasklists[list2] = tasklist;
+        tasklists[list1].setIndex(list1);
+        tasklists[list2].setIndex(list2);
     };
 
     commandMap["delete"] = deleteCommand;

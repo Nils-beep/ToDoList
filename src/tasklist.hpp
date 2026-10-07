@@ -1,5 +1,6 @@
 #pragma once
 #include "includes.hpp"
+#include <filesystem>
 #include <iterator>
 #include <codecvt>
 #include <string>
@@ -48,15 +49,16 @@ class Tasklist{
         std::string name;
         Priority prio;
         std::vector<Task> tasks;
-        std::string filepath;
+
         bool hidden = false;
         int index;
         void sortByPriority();
     public:
+        std::string filepath;
         Tasklist(std::string n, int index){
             findPriority(&n);
             name = n;
-            filepath = "tasklists/" + name + ".txt";
+            filepath = tasklistFolder + "/" + name + ".txt";
             this->index = index;
         }
         void addTask(std::string* line){
@@ -66,7 +68,11 @@ class Tasklist{
         void toggleTask(int index){tasks[index].toggleTask();}
         void display();
         void findPriority(std::string* line);
-        void deleteTasklist(){remove(filepath.c_str());}
+        void deleteTasklist(){
+            std::filesystem::path path = tasklistFolder+ "/"+name+".txt";
+            std::filesystem::remove(path);
+            std::cout << "hi test" << path << "\n";
+        }
         std::vector<Task>* getTasks(){return &tasks;};
         std::string getName(){return name;}
         void setName(std::string name){this->name = name;}
