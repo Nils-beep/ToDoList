@@ -28,33 +28,18 @@ bool eraseSubstring(std::string* line, std::string subStr, int subPos){
     }
     return true;
 }
-//return value is the command
-// 0: base info name or index
-// 1: secondary info
-// 2: -h hidden   erguhi -h
-std::string convertText(std::string (*text)[parameterAmount]){
-    std::string line = (*text)[mainData];
+
+std::string convertText(std::string (*text)){
+    std::string line = (*text).substr(0, (*text).find(" "));
+    (*text).erase(0, (*text).find(" ")+1);
     if (isInteger(line))
         return "selectList";
-    std::string command = line.substr(0, line.find(" "));
-    line = line.substr(line.find(" ")+1);
-    if (eraseSubstring(&line, "-h", -1))
-        (*text)[hiddenState] = "true";
-    if ((command == "swap") || (command == "switch")){
-        (*text)[mainData] = line.substr(0, line.find(" "));
-        line = line.substr(line.find(" ")+1);
-        (*text)[extraInfo] = line.substr(0, line.find(" "));
-        line = line.substr(line.find(" ")+1);
-        std::cout << "got here\n";
-        return command;
-    }
-    (*text)[mainData] = line;
-    return command;
+    return line;
 }
 
-void TaskWindow::deleteList(std::string parameters[5]){
-    std::cout << parameters[mainData] << "\n";
-    int index = stoi(parameters[mainData]);
+void TaskWindow::deleteList(std::string parameters){
+    std::cout << parameters << "\n";
+    int index = stoi(parameters);
     tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
     return;
 }
@@ -140,11 +125,8 @@ int TaskWindow::handleInput(){
         if (text == ""){
             return -1;
         }
-
-        std::string arguments[5] = {"-","-","-","-","-"};
-        arguments[0] = text;
-        std::string command = convertText(&arguments);
-        commandMap[command](arguments);
+        std::string command = convertText(&text);
+        commandMap[command](text);
         return 0;
     }
     else{
