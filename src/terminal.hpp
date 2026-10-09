@@ -80,8 +80,8 @@ inline TaskWindow::TaskWindow(){
             selectedTasklist = index;
     };
     auto createListCommand = [this](std::string parameters){
-        std::string listName = parameters.substr(0,parameters.find(" "));
-        parameters = parameters.substr(parameters.find(" ")+1); //this should only leave hidden //todo dates and shit
+        std::string listName = parameters.substr(0,parameters.find("-")-1);
+        parameters = parameters.substr(parameters.find("-")); //this should only leave hidden //todo dates and shit
         tasklists.push_back({listName, int(tasklists.size())});
         if (parameters == "-h")
             tasklists[tasklists.size()-1].toggleHidden();
