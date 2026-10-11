@@ -80,6 +80,10 @@ inline TaskWindow::TaskWindow(){
             selectedTasklist = index;
     };
     auto createListCommand = [this](std::string parameters){
+        if (parameters.find("-") == std::string::npos){
+            tasklists.push_back({parameters, int(tasklists.size())});
+            return;
+        }
         std::string listName = parameters.substr(0,parameters.find("-")-1);
         parameters = parameters.substr(parameters.find("-")); //this should only leave hidden //todo dates and shit
         tasklists.push_back({listName, int(tasklists.size())});
