@@ -71,7 +71,6 @@ class Tasklist{
         void deleteTasklist(){
             std::filesystem::path path = tasklistFolder+ "/"+name+".txt";
             std::filesystem::remove(path);
-            std::cout << "hi test" << path << "\n";
         }
         std::vector<Task>* getTasks(){return &tasks;};
         std::string getName(){return name;}

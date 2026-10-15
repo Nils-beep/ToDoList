@@ -39,8 +39,8 @@ std::string convertText(std::string (*text)){
 
 void TaskWindow::deleteList(std::string parameters){
     std::cout << parameters << "\n";
-    int index = stoi(parameters);
-    tasklists[index-1].toDelete = !tasklists[index-1].toDelete;
+    int index = stoi(parameters)-1;
+    tasklists[index].toDelete = !tasklists[index].toDelete;
     return;
 }
 
@@ -93,15 +93,13 @@ void TaskWindow::readFile(){
 void TaskWindow::writeFile(){
     int index = 0;
     for (Tasklist list : tasklists){
-            if (list.toDelete){
-                list.deleteTasklist();
+            if (list.toDelete == true)
                 continue;
-            }
             std::ofstream myfile;
             std::string path = tasklistFolder + "/" + list.getName() + ".txt";
             myfile.open(path);
             myfile << index <<"," << list.getHidden() << ",\n";
-            for (Task task : *tasklists[index].getTasks()){
+            for (Task task : *list.getTasks()){
                 if (!task.getState()){
                     myfile << task.getName();
                     if (task.getPrio() == HIGH)
@@ -114,6 +112,12 @@ void TaskWindow::writeFile(){
             }
             myfile.close();
             index++;
+    }
+    for (Tasklist list : tasklists){
+        if (list.toDelete){
+            list.deleteTasklist();
+            continue;
+        }
     }
 }
 
