@@ -34,6 +34,7 @@ class TaskWindow{
 class TimerWindow{
     private:
         std::map<std::string, std::function<void(std::string)>> commandMap;
+        void createTimer(std::string arguments);
     public:
         TimerWindow();
         void run(){};
