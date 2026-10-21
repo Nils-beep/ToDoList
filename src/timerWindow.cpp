@@ -4,9 +4,12 @@
 
 TimerWindow::TimerWindow(){
     //system("notify-send test");
-    createTimer("");
+    //createTimer("");
 }
 
+void TimerWindow::run(){
+
+};
 
 void TimerWindow::createTimer(std::string arguments){
     system("notify-send test");

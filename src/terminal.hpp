@@ -37,7 +37,7 @@ class TimerWindow{
         void createTimer(std::string arguments);
     public:
         TimerWindow();
-        void run(){};
+        void run();
 };
 
 class Terminal {
@@ -49,9 +49,8 @@ class Terminal {
 
     public:
         bool close = false;
-        Window* changeWindow(Window newWindow){
+        void changeWindow(Window newWindow){
             currentWindow = newWindow;
-            return &currentWindow;
         };
         void run(){
             switch(currentWindow){

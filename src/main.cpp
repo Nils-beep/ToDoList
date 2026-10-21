@@ -14,7 +14,9 @@ int main(int argc, char** argv){
     if (!std::filesystem::exists(folderPath))
         std::filesystem::create_directory(folderPath);
     Terminal terminal;
-    std::string arg1 = argv[1];
+    std::string arg1 = "";
+    if (argc == 2)
+        arg1 = argv[1];
     if (arg1 == "timers")
         terminal.changeWindow(TIMERWINDOW);
     while (!terminal.close)
